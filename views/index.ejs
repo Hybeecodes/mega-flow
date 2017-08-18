@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/bootstrap.css">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>    
+      
+    <%- include('partials/header') %>
+
+    <% if(posts){ %>
+      <% posts.forEach(function(post){ %>
+        <p><%=post.category %></p>
+      <% }); %>
+    %< } %>
+
+    
+
+    <%- include('partials/footer') %>
+    <script src="/javascripts/bootstrap.js"></script>
+    <script src="/javascripts/jquery-3.2.1.js"></script>
+  </body>
+</html>
