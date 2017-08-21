@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/bootstrap.css">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>    
+      
+    <%- include('partials/header') %>
+
+    <!-- Page Content -->
+        <div class="container">
+            <form accept-charset="UTF-8" method="POST" action="/posts/add_post"  role="form">
+                <div class="row">
+
+                <div class="col-md-6 col-md-offset-3">
+                        <div class="form-group label-floating">
+                            <label class="control-label">Post Title</label>
+                            <input type="text" name="title" class="form-control" id="title" >
+
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-md-offset-3">
+                            <label for="category">Select Category</label>
+                            <select class="form-control" id="category" name="category">
+                                <option value="">--Select -- category--</option>
+                                <% categories.forEach(function(category){ %>
+                                    <option value="<%= category.value %>"> <%= category.title %> </option>
+                                <% }) %>
+                              
+                            </select>
+                    </div>
+                        <div class="col-md-6 col-md-offset-3">
+                            <div class="form-group label-floating">
+                                <label class="control-label">Post Details</label>
+                                <textarea style="resize:none;" name="body" class="form-control" rows="7"></textarea>
+    
+                            </div>
+                        </div>
+
+                <div class="col-md-12 text-center">
+                <button type="submit" name="submit" class="btn btn-primary">Add Post</button>
+                </div>
+                
+                <div class="clearfix"></div>
+            </form>
+              
+        </div>
+          <!-- /.container -->
+
+    <%- include('partials/footer') %>
+    <script src="/ckeditor2/ckeditor.js"></script>
+    <script>
+        CKEDITOR.replace('body');
+    </script>
+    
+    <script src="/javascripts/bootstrap.js"></script>
+    <script src="/javascripts/jquery-3.2.1.js"></script>
+  </body>
+</html>

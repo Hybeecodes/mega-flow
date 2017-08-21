@@ -4,14 +4,19 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var expressValidator = require('express-validator');
 var cookieParser = require('cookie-parser');
-var session = require('express-session');
 var bodyParser = require('body-parser');
+var session = require('express-session');
 var mongo = require('mongodb');
 var db = require('monk')('localhost/nodeblog');
 var multer = require('multer');
 var flash = require('connect-flash');
+
+
+
 var index = require('./routes/index');
 var users = require('./routes/users');
+var posts = require('./routes/posts');
+
 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -24,7 +29,10 @@ var storage = multer.diskStorage({
  
 var upload = multer({ storage: storage })
 
+
+
 var app = express();
+app.locals.moment = require('moment');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -80,6 +88,7 @@ app.use(function(req,res,next){
 
 app.use('/', index);
 app.use('/users', users);
+app.use('/posts',posts);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
