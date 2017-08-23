@@ -4,13 +4,16 @@ const mongo = require('mongodb');
 var db =require('monk')('localhost/nodeblog');
 var posts = db.get('posts');
 var categories = db.get('categories');
+var Paginate = require('mongo-paginate');
+
+
 
 /* GET posts listing. */
 router.get('/', function(req, res, next) {
 
     posts.find({},{},function(err,posts){
-      res.render('posts', { title: 'Node Blog',posts:posts });
-    })
+      res.render('posts/posts', { title: 'Mega Flow - Posts',posts:posts });
+    });
     
   });
   
@@ -19,14 +22,14 @@ router.get('/', function(req, res, next) {
 router.get('/get_post_by_id/:id',function(req,res,next){
     posts.findOne({_id:req.params.id},function(err,post){
       if(err) throw err;
-      res.render('post',{'title':'View Post',post:post});
+      res.render('posts/post',{title:'View Post',post:post});
     });
     
   });
   
   router.get('/add_post',function(req,res,next){
     categories.find({},{},function(err,categories){
-        res.render('add_post',{title:'Add Post', categories:categories});
+        res.render('posts/add_post',{title:'Mega Flow - Add Post', categories:categories,errors:false});
     });
     
   });
@@ -38,7 +41,9 @@ router.get('/get_post_by_id/:id',function(req,res,next){
   
     req.getValidationResult().then(function(result) {
       if (!result.isEmpty()) {
-       res.render('add_post',{title:'Add Post', errors:result.array()})
+        categories.find({},{},function(err,categories){
+          res.render('posts/add_post',{title:'Mega Flow - Add Post', categories:categories,errors:result.array()});
+      });
       }else{
         var title = req.body.title;
         var category = req.body.category;

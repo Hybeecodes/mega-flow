@@ -5,7 +5,7 @@ var db =require('monk')('localhost/nodeblog');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-    res.render('index', { title: 'Node Blog'});
+    res.render('index', { title: 'Mega Flow',user:false});
 });
 
 

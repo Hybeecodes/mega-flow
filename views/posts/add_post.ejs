@@ -2,17 +2,30 @@
 <html>
   <head>
     <title><%= title %></title>
-    <link rel="stylesheet" href="/stylesheets/bootstrap.css">
+    <link rel="stylesheet" href="/stylesheets/bootstrap.css"/>
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>    
       
-    <%- include('partials/header') %>
+    <%- include('../partials/header') %>
 
     <!-- Page Content -->
         <div class="container">
+            
             <form accept-charset="UTF-8" method="POST" action="/posts/add_post"  role="form">
+                
                 <div class="row">
+                        <center>
+                             <h3>Post Form </h3>
+                            
+                        <% if(errors){ %>
+                            <% errors.forEach(function(error){ %>
+                                <div class="alert alert-danger" style="width:50%;">
+                                   <%= error.msg %>
+                                </div>
+                            <% }) %>
+                        <% } %>
+                        </center>
 
                 <div class="col-md-6 col-md-offset-3">
                         <div class="form-group label-floating">
@@ -21,6 +34,7 @@
 
                         </div>
                     </div>
+                    
                     <div class="col-md-6 col-md-offset-3">
                             <label for="category">Select Category</label>
                             <select class="form-control" id="category" name="category">
@@ -49,7 +63,7 @@
         </div>
           <!-- /.container -->
 
-    <%- include('partials/footer') %>
+    <%- include('../partials/footer') %>
     <script src="/ckeditor2/ckeditor.js"></script>
     <script>
         CKEDITOR.replace('body');
