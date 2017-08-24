@@ -41,8 +41,10 @@ router.get('/register',function(req,res,next){
 });
 
 router.post('/login',function(req,res,next){
+
+  // validate inputs
   req.checkBody('email','email field is required').notEmpty();
-  req.checkBody('email','please  enter a valid email').isEmpty();
+  req.checkBody('email','please  enter a valid email').isEmail();
   req.checkBody('password','password field is required').notEmpty();
 
   req.getValidationResult().then(function(result) {
@@ -50,12 +52,30 @@ router.post('/login',function(req,res,next){
       res.render('users/login',{title:'Mega Flow - Login',errors:result.array()});
     }else{
       var email = req.body.email;
-      var password = req.body.password;
-      users.findOne({email:email,password:password},function(err,user){
-        if(err){
-          console.log('login not successful');
+      var password =req.body.password;
+      users.findOne({email:email},function(err,user){
+        console.log(user);
+        if(!user){
+          var errors = [
+            {
+              msg:'Invalid email or password'
+            }
+          ]
+          res.render('users/login',{title:'Mega Flow - Login',errors:errors});
+        }else{
+          if(bcrypt.compareSync(password,user.password)){
+            res.redirect(301,'/posts');
+          }else{
+            var errors = [
+              {
+                msg:'Invalid password'
+              }
+            ]
+            res.render('users/login',{title:'Mega Flow - Login',errors:errors});
+          }
+          
         }
-        res.render('index',{title:'Mega Flow',user:user});
+        
       })
     }
   });
@@ -123,6 +143,13 @@ router.post('/register',upload.single('photo'),function(req,res,next){
     }
   });
 
+});
+// get user profile by id
+router.get('/profile/:id',function(req,res,next){
+  users.findOne({_id:req.params.id},function(err,user){
+    if(err) throw err;
+    res.json(user);
+  })
 });
 
 module.exports = router;
