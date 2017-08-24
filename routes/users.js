@@ -6,6 +6,7 @@ var multer = require('multer');
 var users = db.get('users');
 var bcrypt = require('bcrypt-nodejs');
 const nodemailer = require('nodemailer');
+const passwoid = require('passwoid');
 
 var transporter = nodemailer.createTransport({
   service: 'Gmail',
@@ -98,7 +99,7 @@ router.post('/register',upload.single('photo'),function(req,res,next){
 
   req.getValidationResult().then(function(result){
     if(!result.isEmpty()){
-      res.render('users/register',{title:'Mega Flow - Register',errors:result.array()});
+      res.render('users/register',{title:'Mega Flow - Register',errors:result.array(),success:false});
     }else{
       var firstname = req.body.firstname;
       var lastname = req.body.lastname;
@@ -108,42 +109,110 @@ router.post('/register',upload.single('photo'),function(req,res,next){
       var photo = req.file;
       console.log(photo);
 
-      users.insert({
-        firstname:firstname,
-        lastname:lastname,
-        password:password,
-        email:email,
-        username:username,
-        photo: photo
-      
-      },function(err,user){
-        if(err){
-          console.log('error saving user')
-        }else{
-          res.render('users/register',{title:'Mega Flow - Register',errors:false,success:true});
-          // send confirmation email
-          var mailOptions = {
-            from: 'My Catalogue ',
-            to: email,
-            subject:'Registration Confirlmation',
-            text:'Your registration on MegaFlow was successful'
-          };
-    
-          transporter.sendMail(mailOptions,function(err,info){
-            if(err){
-              console.log(err);
-            }else{
-              console.log('Email Sent');
-              res.render('index',{message:'Confirmation message has been sent your email', title:'My Catalogue'});
+      // check if user exists
+      users.findOne({username:username},function(err,user){
+        if(user){
+          var errors = [
+            {
+              msg:'Username Already exists '
             }
-          })
-          res.redirect(301,'index');
+          ]
+          res.render('users/register',{title:'Mega Flow - Register',errors:errors,success:false});
+        }else{
+          users.findOne({email:email},function(err,user){
+            if(user){
+              var errors = [
+                {
+                  msg:'Email Already exists '
+                }
+              ]
+              res.render('users/register',{title:'Mega Flow - Register',errors:errors,success:false});
+              return;
+            }else{
+              users.insert({
+                firstname:firstname,
+                lastname:lastname,
+                password:password,
+                email:email,
+                username:username,
+                photo: photo
+              
+              },function(err,user){
+                if(err){
+                  console.log('error saving user')
+                }else{
+                  res.render('users/register',{title:'Mega Flow - Register',errors:false,success:true});
+                  // send confirmation email
+                  var mailOptions = {
+                    from: 'My Catalogue ',
+                    to: email,
+                    subject:'Registration Confirlmation',
+                    text:'Your registration on MegaFlow was successful'
+                  };
+            
+                  transporter.sendMail(mailOptions,function(err,info){
+                    if(err){
+                      console.log(err);
+                    }else{
+                      console.log('Email Sent');
+                      res.render('index',{message:'Confirmation message has been sent your email', title:'My Catalogue'});
+                    }
+                  })
+                  res.redirect(301,'index');
+                }
+              })
+        
+            }
+          });
         }
       })
-    }
+      
+      
+
+         }
   });
 
 });
+
+router.get('/reset_password',function(req,res,next){
+  res.render('users/reset_password',{title:'Mega Flow - Reset Password',errors:false, success:false});
+})
+
+//forgot password
+router.post('/reset_password',function(req,res,next){
+
+  // verify email
+  req.checkBody('email','email is required').notEmpty();
+  req.checkBody('email','Enter a valid email').isEmail();
+
+  req.getValidationResult().then(function(result){
+    if(!result.isEmpty()){
+      res.render('users/reset_password',{title:'Mega Flow - Reset Password',errors:result.array() ,success:false});
+    }else{
+      var email = req.body.email;
+      var newPass = passwoid(10);
+      users.findOne({})
+      console.log(newPass);
+      var mailOptions = {
+        from: 'My Catalogue ',
+        to: email,
+        subject:'Password Reset',
+        text:'Your new password is : '+newPass
+      };
+
+      transporter.sendMail(mailOptions,function(err,info){
+        if(err){
+          console.log(err);
+        }else{
+          console.log('Email Sent');
+          res.render('users/reset_password',{title:'Mega Flow - Reset Password',errors:false, success:true});
+        }
+      })
+      
+    }
+  });
+
+})
 // get user profile by id
 router.get('/profile/:id',function(req,res,next){
   users.findOne({_id:req.params.id},function(err,user){
