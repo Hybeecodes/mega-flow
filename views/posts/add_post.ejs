@@ -12,7 +12,7 @@
     <!-- Page Content -->
         <div class="container">
             
-            <form accept-charset="UTF-8" method="POST" action="/posts/add_post"  role="form">
+            <form accept-charset="UTF-8" method="POST" action="/posts/add_post" enctype="multipart/form-data" role="form">
                 
                 <div class="row">
                         <center>
@@ -52,6 +52,10 @@
     
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label for="picture">Upload a picture (optional)</label>
+                            <input type="file" class="form-control" id="post_img" name="post_img">
+                          </div>
 
                 <div class="col-md-12 text-center">
                 <button type="submit" name="submit" class="btn btn-primary">Add Post</button>
