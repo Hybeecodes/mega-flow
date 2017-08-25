@@ -7,6 +7,40 @@ var users = db.get('users');
 var bcrypt = require('bcrypt-nodejs');
 const nodemailer = require('nodemailer');
 const passwoid = require('passwoid');
+const jwt = require('jsonwebtoken');
+
+var passport = require('passport');
+var passportJWT = require('passport-jwt');
+
+var ExtractJwt = passportJWT.ExtractJwt;
+var JwtStrategy = passportJWT.Strategy;
+
+var myusers = [
+  {
+    id:1,
+    name:'megastar',
+    password:'1234'
+  },
+  {
+    id:2,
+    name:'obikoya',
+    password:'9999'
+  }
+];
+
+var jwtOptions = {}
+jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeader();
+jwtOptions.secretOrKey = 'jesus';
+
+var strategy = new JwtStrategy(jwtOptions,function(jwt_payload,next){
+  //database call:
+  var user = myusers[_.findIndex(users,{id:jwt_payload.id})];
+  if(user){
+    next(null,user);
+  }else{
+    next(null,false);
+  }
+})
 
 var transporter = nodemailer.createTransport({
   service: 'Gmail',
@@ -191,27 +225,40 @@ router.post('/reset_password',function(req,res,next){
     }else{
       var email = req.body.email;
       var newPass = passwoid(10);
-      users.findOne({})
       console.log(newPass);
-      var mailOptions = {
-        from: 'My Catalogue ',
-        to: email,
-        subject:'Password Reset',
-        text:'Your new password is : '+newPass
-      };
-
-      transporter.sendMail(mailOptions,function(err,info){
-        if(err){
-          console.log(err);
-        }else{
-          console.log('Email Sent');
-          res.render('users/reset_password',{title:'Mega Flow - Reset Password',errors:false, success:true});
-        }
+      var password = bcrypt.hashSync(newPass);
+      users.update({email: email}, {$set:{password:password}},function(err,result){
+        if(err) throw err;
+        
+        var mailOptions = {
+          from: 'My Catalogue ',
+          to: email,
+          subject:'Password Reset',
+          text:'Your new password is : '+newPass
+        };
+  
+        transporter.sendMail(mailOptions,function(err,info){
+          if(err){
+            console.log(err);
+          }else{
+            console.log('Email Sent');
+            res.render('users/reset_password',{title:'Mega Flow - Reset Password',errors:false, success:true});
+          }
+        })
       })
-      
     }
   });
 
+});
+
+//change password
+router.get('/change_password',function(req,res,next){
+  res.render('users/change_password',{title:'Mega Flow - Change Password'});
+});
+
+router.post('/change_password',function(req,res,next){
+  // validate inputs
+  
 })
 // get user profile by id
 router.get('/profile/:id',function(req,res,next){
