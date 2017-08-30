@@ -1,52 +1,31 @@
 var express = require('express');
 var router = express.Router();
+var app = require('../app');
 const mongo = require('mongodb');
 var db =require('monk')('localhost/nodeblog');
-var multer = require('multer'); 
+var multer = require('multer');
 var users = db.get('users');
 var bcrypt = require('bcrypt-nodejs');
 const nodemailer = require('nodemailer');
+var passport = require('passport');
+// var LocalStrategy = require('passport-local').Strategy;
 const passwoid = require('passwoid');
 const jwt = require('jsonwebtoken');
+const csrf = require('csurf');
+
+var csrfProtection = csrf({ cookie: true });
+// router.use(csrfProtection);
+
+
 
 var passport = require('passport');
-var passportJWT = require('passport-jwt');
-
-var ExtractJwt = passportJWT.ExtractJwt;
-var JwtStrategy = passportJWT.Strategy;
-
-var myusers = [
-  {
-    id:1,
-    name:'megastar',
-    password:'1234'
-  },
-  {
-    id:2,
-    name:'obikoya',
-    password:'9999'
-  }
-];
-
-var jwtOptions = {}
-jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeader();
-jwtOptions.secretOrKey = 'jesus';
-
-var strategy = new JwtStrategy(jwtOptions,function(jwt_payload,next){
-  //database call:
-  var user = myusers[_.findIndex(users,{id:jwt_payload.id})];
-  if(user){
-    next(null,user);
-  }else{
-    next(null,false);
-  }
-})
+const LocalStrategy = require('passport-local').Strategy;
 
 var transporter = nodemailer.createTransport({
   service: 'Gmail',
   auth:{
-    user: 'obikoya11@gmail.com',
-    pass:'M.egastar98'
+    user: app.Email_User,
+    pass: app.Email_Password
   }
 });
 
@@ -62,59 +41,63 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage })
 
 
+passport.serializeUser(function(user, done) {
+  done(null, user._id);
+});
+ 
+passport.deserializeUser(function(id, done) {
+  users.findOne({_id:id}, function (err, user) {
+    done(err, user);
+  });
+});
+
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   res.send('respond with a resource');
 });
 
+
 router.get('/login',function(req,res,next){
   res.render('users/login',{title:'Mega Flow - Login',errors:false});
 });
 
+passport.use(new LocalStrategy(
+  function(username,password,done){
+    users.findOne({username:username},function(err,user){
+      if(err) throw err;
+      if(!user){
+        console.log('Unknown user');
+        return done(null,false,{message:'Unknown User'});
+      }
+      if(!bcrypt.compareSync(password,user.password)){
+        console.log('Invalid password');
+        return done(null,false,{message:'Invalid Password'});
+      }else{
+        return done(null,user);
+      }
+    })
+
+}))
+
+router.post('/login',passport.authenticate('local',{failureRedirect:'/users/login',failureFlash:'Invalid username or password'}),
+function(req,res,next){
+  console.log('Authentication successful');
+  req.flash('success','You are logged in');
+  res.redirect('/');
+});
+router.get('/logout',function(req,res,next){
+  req.logout;
+  console.log('user logged out');
+  req.flash('success','You have been logged out');
+  res.redirect('/users/login');
+})
+
+
 router.get('/register',function(req,res,next){
   res.render('users/register',{title:'Mega Flow - Register',errors:false,success:false});
 });
+https://www.linuxmint.com/start/rebecca/
 
-router.post('/login',function(req,res,next){
-
-  // validate inputs
-  req.checkBody('email','email field is required').notEmpty();
-  req.checkBody('email','please  enter a valid email').isEmail();
-  req.checkBody('password','password field is required').notEmpty();
-
-  req.getValidationResult().then(function(result) {
-    if (!result.isEmpty()) {
-      res.render('users/login',{title:'Mega Flow - Login',errors:result.array()});
-    }else{
-      var email = req.body.email;
-      var password =req.body.password;
-      users.findOne({email:email},function(err,user){
-        console.log(user);
-        if(!user){
-          var errors = [
-            {
-              msg:'Invalid email or password'
-            }
-          ]
-          res.render('users/login',{title:'Mega Flow - Login',errors:errors});
-        }else{
-          if(bcrypt.compareSync(password,user.password)){
-            res.redirect(301,'/posts');
-          }else{
-            var errors = [
-              {
-                msg:'Invalid password'
-              }
-            ]
-            res.render('users/login',{title:'Mega Flow - Login',errors:errors});
-          }
-          
-        }
-        
-      })
-    }
-  });
-});
 
 router.post('/register',upload.single('photo'),function(req,res,next){
 
@@ -129,7 +112,10 @@ router.post('/register',upload.single('photo'),function(req,res,next){
    
   // validate the profile picture
   
-
+  if (!req.file) {
+    res.send('No files to upload.');
+    return;
+}
 
   req.getValidationResult().then(function(result){
     if(!result.isEmpty()){

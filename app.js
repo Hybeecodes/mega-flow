@@ -10,24 +10,24 @@ var mongo = require('mongodb');
 var db = require('monk')('localhost/nodeblog');
 var multer = require('multer');
 var flash = require('connect-flash');
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+var csrf = require('csurf');
+var MongoDBStore = require('connect-mongodb-session')(session);
 
+
+var store = new MongoDBStore(
+  {
+    uri: 'mongodb://localhost:27017/nodeblog',
+    collection: 'mySessions'
+  });
 
 
 var index = require('./routes/index');
 var users = require('./routes/users');
 var posts = require('./routes/posts');
 
-
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './public/images/uploads')
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now())
-  }
-});
- 
-var upload = multer({ storage: storage })
+var csrfProtection = csrf({ cookie: true })
 
 
 
@@ -38,8 +38,12 @@ app.locals.moment = require('moment');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-//handle file uploads & multpart Data
-// app.use(multer({dest:'./public/images/uploads'}));
+
+store.on('error', function(error) {
+  assert.ifError(error);
+  assert.ok(false);
+});
+
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -49,9 +53,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({
   secret:'secret',
-  saveUninitialized:true,
-  resave:true 
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week 
+  },
+  store: store,
+   saveUninitialized:true,
+   resave:true 
 }));
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 app.use(expressValidator({
   errorFormatter: function(param, msg, value) {
@@ -80,15 +91,18 @@ app.use(function(req,res,next){
   next();
 });
 
+
 //make db accessible to routes
 app.use(function(req,res,next){ 
   req.db = db;
   next();
-})
+});
+
 
 app.use('/', index);
 app.use('/users', users);
 app.use('/posts', posts);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -96,6 +110,7 @@ app.use(function(req, res, next) {
   err.status = 404;
   next(err);
 });
+
 
 // error handler
 app.use(function(err, req, res, next) {
@@ -108,4 +123,7 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+
 module.exports = app;
+module.exports.Email_Password = 'M.egastar98';
+module.exports.Email_User = 'obikoya11@gmail.com';
