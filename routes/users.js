@@ -86,7 +86,7 @@ function(req,res,next){
   res.redirect('/');
 });
 router.get('/logout',function(req,res,next){
-  req.logout;
+  req.logout();
   console.log('user logged out');
   req.flash('success','You have been logged out');
   res.redirect('/users/login');
@@ -96,7 +96,7 @@ router.get('/logout',function(req,res,next){
 router.get('/register',function(req,res,next){
   res.render('users/register',{title:'Mega Flow - Register',errors:false,success:false});
 });
-https://www.linuxmint.com/start/rebecca/
+
 
 
 router.post('/register',upload.single('photo'),function(req,res,next){

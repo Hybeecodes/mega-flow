@@ -15,7 +15,7 @@ var LocalStrategy = require('passport-local').Strategy;
 var csrf = require('csurf');
 var MongoDBStore = require('connect-mongodb-session')(session);
 
-
+require('events').EventEmitter.prototype._maxListeners = 0;
 var store = new MongoDBStore(
   {
     uri: 'mongodb://localhost:27017/nodeblog',
@@ -52,14 +52,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({
-  secret:'secret',
-  cookie: {
-    maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week 
-  },
-  store: store,
-   saveUninitialized:true,
-   resave:true 
-}));
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true }
+}))
 app.use(passport.initialize());
 app.use(passport.session());
 
