@@ -23,10 +23,12 @@
   </head>
 
   <body>
-    
+
+    <% if(user){ %>
+      <%- include('partials/header') %>
+    <% }else{ %>
       <%- include('partials/not_user_header') %>
-   
-    
+    <% } %>
      <!-- Navigation -->
      <!-- <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
       <a class="navbar-brand" href="index.html">Start Bootstrap</a>
@@ -59,7 +61,7 @@
           <div class="col-lg-8 col-md-10 mx-auto">
             <div class="site-heading ">
               <h1 class="text-center"> Mega Flow</h1>
-              <<marquee behavior="" direction="">
+              <marquee behavior="" direction="">
                 <span class="subheading">You can be changed by what you see</span>
               </marquee>
             </div>

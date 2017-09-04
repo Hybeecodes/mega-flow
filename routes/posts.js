@@ -10,7 +10,8 @@ var Paginate = require('mongo-paginate');
 
 /* GET posts listing. */
 router.get('/', function(req, res, next) {
-
+  console.log('user');
+  console.log(req.user);
     posts.find({},{},function(err,posts){
       res.render('posts/posts', { title: 'Mega Flow - Posts',posts:posts });
     });
@@ -28,6 +29,8 @@ router.get('/get_post_by_id/:id',function(req,res,next){
   });
   
   router.get('/add_post',function(req,res,next){
+    console.log('user');
+    console.log(req.user);
     categories.find({},{},function(err,categories){
         res.render('posts/add_post',{title:'Mega Flow - Add Post', categories:categories,errors:false});
     });
@@ -77,6 +80,13 @@ router.get('/get_posts_by_category/:cat',function(req,res,next){
     res.json(posts);
   });
 });
+
+// get posts by user
+router.get('/get_by_user/:user',function(req,res,next){
+  posts.find({author:req.params.user},function(err,post){
+    
+  })
+})
 
 
 

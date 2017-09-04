@@ -15,7 +15,7 @@ var LocalStrategy = require('passport-local').Strategy;
 var csrf = require('csurf');
 var MongoDBStore = require('connect-mongodb-session')(session);
 
-require('events').EventEmitter.prototype._maxListeners = 0;
+// require('events').EventEmitter.prototype._maxListeners = 100;
 var store = new MongoDBStore(
   {
     uri: 'mongodb://localhost:27017/nodeblog',
@@ -28,8 +28,6 @@ var users = require('./routes/users');
 var posts = require('./routes/posts');
 
 var csrfProtection = csrf({ cookie: true })
-
-
 
 var app = express();
 app.locals.moment = require('moment');
@@ -53,12 +51,25 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({
   secret: 'keyboard cat',
-  resave: false,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week 
+  },
+  store: store,
+  resave: true,
   saveUninitialized: true,
-  cookie: { secure: true }
+  // 
 }))
+
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use(function(req, res, next){
+  // if there's a flash message, transfer
+  // it to the context, then clear it
+  res.locals.flash = req.session.flash;
+  delete req.session.flash;
+  next();
+  });
 
 
 app.use(expressValidator({

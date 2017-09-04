@@ -58,46 +58,62 @@ router.get('/', function(req, res, next) {
 
 
 router.get('/login',function(req,res,next){
+  //console.log(req.session);
   res.render('users/login',{title:'Mega Flow - Login',errors:false});
 });
 
 passport.use(new LocalStrategy(
   function(username,password,done){
+    // var collection = db.get('users');
     users.findOne({username:username},function(err,user){
-      if(err) throw err;
+      if(err){
+        throw err;
+      }
       if(!user){
-        console.log('Unknown user');
-        return done(null,false,{message:'Unknown User'});
-      }
-      if(!bcrypt.compareSync(password,user.password)){
-        console.log('Invalid password');
-        return done(null,false,{message:'Invalid Password'});
-      }else{
-        return done(null,user);
-      }
-    })
+        console.log('unknown user');
+        return done(null,false,{message:'unknown user'});
 
-}))
+      }
+      if(user){
+        if(!bcrypt.compareSync(password,user.password)){
+          console.log('invalid password');
+          return done(null,false,{message:'Invalid password'});
+        }else{
+          return done(null,user);
+        }
+      }
+      
+    });
+}
+));
 
-router.post('/login',passport.authenticate('local',{failureRedirect:'/users/login',failureFlash:'Invalid username or password'}),
-function(req,res,next){
+router.post('/login',passport.authenticate('local',{
+  failureRedirect:'/users/login',
+  failureFlash:'Invalid username or password'
+}),function(req,res,next){
   console.log('Authentication successful');
+  //  req.session.username = req.body.username; 
   req.flash('success','You are logged in');
-  res.redirect('/');
-});
-router.get('/logout',function(req,res,next){
-  req.logout();
-  console.log('user logged out');
-  req.flash('success','You have been logged out');
-  res.redirect('/users/login');
+  res.redirect(303,'/'); 
 })
+
+
+router.get('/logout',function(req,res){
+  req.session.destroy(function(err) {
+    if(err) {
+      console.log(err);
+    } else {
+      console.log('you just logged out');
+      res.redirect('/users/login');
+      console.log(req.session);
+    }
+  });
+  });
 
 
 router.get('/register',function(req,res,next){
   res.render('users/register',{title:'Mega Flow - Register',errors:false,success:false});
 });
-
-
 
 router.post('/register',upload.single('photo'),function(req,res,next){
 
@@ -112,10 +128,10 @@ router.post('/register',upload.single('photo'),function(req,res,next){
    
   // validate the profile picture
   
-  if (!req.file) {
-    res.send('No files to upload.');
-    return;
-}
+//   if (!req.file) {
+//     res.send('No files to upload.');
+//     return;
+// }
 
   req.getValidationResult().then(function(result){
     if(!result.isEmpty()){
