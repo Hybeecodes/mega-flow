@@ -30,6 +30,8 @@ var transporter = nodemailer.createTransport({
 });
 
 
+
+
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, './public/images/uploads')
@@ -55,6 +57,14 @@ passport.deserializeUser(function(id, done) {
 router.get('/', function(req, res, next) {
   res.send('respond with a resource');
 });
+
+router.get('/dashboard',function(req,res){
+  if(req.user){
+    res.render('users/dashboard',{title:'MegaSlack - dashboard',user:req.user,name:'dashboard'});
+  }else{
+    res.send('You need to login to access this page');
+  }
+})
 
 
 router.get('/login',function(req,res,next){
@@ -87,6 +97,15 @@ passport.use(new LocalStrategy(
 }
 ));
 
+router.get('/profile',function(req,res,next){
+  if(req.user){
+    res.render('users/profile',{user:req.user,title:'MegaFlow - profile', name:'profile'});
+  }else{
+    res.send('You are not even logged in, which profile do you want to check???')
+  } 
+  
+})
+
 router.post('/login',passport.authenticate('local',{
   failureRedirect:'/users/login',
   failureFlash:'Invalid username or password'
@@ -94,7 +113,8 @@ router.post('/login',passport.authenticate('local',{
   console.log('Authentication successful');
   //  req.session.username = req.body.username; 
   req.flash('success','You are logged in');
-  res.redirect(303,'/'); 
+  var user = req.user;
+  res.redirect(303,'/users/dashboard'); 
 })
 
 

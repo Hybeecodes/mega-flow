@@ -17,15 +17,15 @@ var sess;
 /* GET home page. */
 router.get('/', function(req, res, next) {
     console.log(req.user);
-    if(req.user){
-        var user = req.user;
-        console.log(user)
-        var user = req.user;
-        res.render('index', { title: 'Mega Flow',user:user});
-    }else{
-        res.render('index', { title: 'Mega Flow',user:false});
-    }
-            
+    // if(req.user){
+    //     // var user = req.user;
+    //     // console.log(user)
+    //     // var user = req.user;
+    //     res.render('users/dashboard', { title: 'Mega Flow - ',user:user});
+    // }else{
+    //     res.render('index', { title: 'Mega Flow',user:false});
+    // }
+    res.render('index', { title: 'Mega Flow',user:false});
 });
 router.get('/session',function(req,res,next){
     res.send('Hello ' + JSON.stringify(req.session));

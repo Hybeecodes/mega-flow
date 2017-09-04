@@ -6,17 +6,17 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>    
-      
-    <%- include('../partials/header') %>
-
+    <%- include('../partials/user-side-nav') %>
+    
     <!-- Page Content -->
         <div class="container">
+            <%- include('../partials/header') %>
             
             <form accept-charset="UTF-8" method="POST" action="/posts/add_post" enctype="multipart/form-data" role="form">
                 
                 <div class="row">
                         <center>
-                             <h3>Post Form </h3>
+                             <h3>Add New Post </h3>
                             
                         <% if(errors){ %>
                             <% errors.forEach(function(error){ %>
@@ -29,7 +29,7 @@
 
                 <div class="col-md-6 col-md-offset-3">
                         <div class="form-group label-floating">
-                            <label class="control-label">Post Title</label>
+                            <label class="control-label" for="title">Post Title</label>
                             <input type="text" name="title" class="form-control" id="title" >
 
                         </div>
@@ -52,10 +52,12 @@
     
                             </div>
                         </div>
+                        <div class="col-md-6 col-md-offset-3">
                         <div class="form-group">
                             <label for="picture">Upload a picture (optional)</label>
-                            <input type="file" class="form-control" id="post_img" name="post_img">
+                            <input type="file" class="form-control" id="post_img" name="post_img" accept="image/*">
                           </div>
+                        </div>
 
                 <div class="col-md-12 text-center">
                 <button type="submit" name="submit" class="btn btn-primary">Add Post</button>

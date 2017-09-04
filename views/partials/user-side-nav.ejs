@@ -1,0 +1,98 @@
+<div class="sidebar" data-color="brown" data-image="/images/sidebar-5.jpg">
+<div class="sidebar-wrapper">
+    <div class="logo">
+        <a href="/users/dashboard" class="simple-text">
+            MegaFlow
+        </a>
+    </div>
+
+    <ul class="nav">
+        <li
+        <% if(name === 'dashboard'){ %>
+            class="active"
+        <% }else{ %>
+            class=""
+        <% }%>
+        >
+            <a href="/users/dashboard">
+                <i class="pe-7s-graph"></i>
+                <p>Dashboard</p>
+            </a>
+        </li>
+        <li 
+            <% if(name === 'profile'){ %>
+                class="active"
+            <% }else{ %>
+                class=""
+            <% }%>
+        >
+            <a href="/users/profile">
+                <i class="pe-7s-user"></i>
+                <p>User Profile</p>
+            </a>
+        </li>
+        <li
+        <% if(name === 'viewPost'){ %>
+            class="active"
+        <% }else{ %>
+            class=""
+        <% }%>
+        >
+            <a href="/posts/my_post">
+                <i class="pe-7s-note2"></i>
+                <p>View My Posts</p>
+            </a>
+        </li>
+
+        <li
+        <% if(name === 'addPost'){ %>
+            class="active"
+        <% }else{ %>
+            class=""
+        <% }%>
+        >
+            <a href="/posts/add_post">
+                <i class="pe-7s-note2"></i>
+                <p>Add Post</p>
+            </a>
+        </li>
+        <li
+        <% if(name === 'viewCat'){ %>
+            class="active"
+        <% }else{ %>
+            class=""
+        <% }%>
+        >
+            <a href="/categories/view_my_cat">
+                <i class="pe-7s-news-paper"></i>
+                <p>View Category</p>
+            </a>
+        </li>
+        <li
+        <% if(name === 'addCat'){ %>
+            class="active"
+        <% }else{ %>
+            class=""
+        <% }%>
+        >
+            <a href="/categories/add_cat">
+                <i class="pe-7s-science"></i>
+                <p>Add Category</p>
+            </a>
+        </li>
+        <li>
+            <a href="maps.html">
+                <i class="pe-7s-map-marker"></i>
+                <p>Maps</p>
+            </a>
+        </li>
+        <li>
+            <a href="notifications.html">
+                <i class="pe-7s-bell"></i>
+                <p>Notifications</p>
+            </a>
+        </li>
+       
+    </ul>
+</div>
+</div>
