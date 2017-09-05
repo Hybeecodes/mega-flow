@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/bootstrap.css">
+    <link rel='stylesheet' href='/stylesheets/style.css'>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.13.1/jquery.validate.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+</head>
+<body>
+    <div>
+            <%- include('./partials/user-side-nav') %>
+            
+            <div class="container">
+    
+                    <%- include('./partials/header') %>
+                    <h3>Your Categories</h3>
+    
+            
+             <div class="jumbotron">
+                    <ul class="list-group">
+                    <% cats.forEach(function(cat){ %>  
+                    <li class="list-group-item"><%= cat.cat_name %> <span class="badge">0</span></li>
+                    <% }) %>
+                </ul> 
+                        
+             </div>
+             <%- include('./partials/footer') %>
+            </div>
+        
+    </div>
+        
+     <script src="/javascripts/bootstrap.js"></script>
+     <script src="/javascripts/jquery-3.2.1.js"></script>
+</body>
+</html>

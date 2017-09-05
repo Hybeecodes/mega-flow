@@ -106,6 +106,10 @@ router.get('/profile',function(req,res,next){
   
 })
 
+router.get('/image',function(req,res,next){
+  res.send(req.user.photo);
+})
+
 router.post('/login',passport.authenticate('local',{
   failureRedirect:'/users/login',
   failureFlash:'Invalid username or password'

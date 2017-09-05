@@ -55,12 +55,12 @@ router.get('/get_post_by_id/:id',function(req,res,next){
   
     req.getValidationResult().then(function(result) {
       if (!result.isEmpty()) {
-        categories.find({},{},function(err,categories){
+        categories.find({cat_author:req.user.username},function(err,categories){
           res.render('posts/add_post',{title:'Mega Flow - Add Post', categories:categories,errors:result.array(),user:req.user,name:'addPost'});
       });
       }else{
         var title = req.body.title;
-        var category = req.body.category;
+        var category_id = req.body.category;
         var body = req.body.body;
         var author_id = req.user._id;
         var date = new Date();

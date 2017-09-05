@@ -26,6 +26,7 @@ var store = new MongoDBStore(
 var index = require('./routes/index');
 var users = require('./routes/users');
 var posts = require('./routes/posts');
+var categories = require('./routes/categories')
 
 var csrfProtection = csrf({ cookie: true })
 
@@ -110,6 +111,7 @@ app.use(function(req,res,next){
 app.use('/', index);
 app.use('/users', users);
 app.use('/posts', posts);
+app.use('/categories',categories);
 
 
 // catch 404 and forward to error handler

@@ -1,51 +1,35 @@
-
 <!-- <img src="/images/grid.png" alt=""> -->
 <link rel="stylesheet" href="/stylesheets/bootstrap.css">
 <link rel='stylesheet' href='/stylesheets/style.css' />
 
-<nav class="navbar navbar-default">
+<nav class="navbar navbar-default navbar-fixed">
   <div class="container-fluid">
-    <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="#">Brand</a>
-    </div>
+      <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">MegaFlow</a>
+      </div>
+      <div class="collapse navbar-collapse">
 
-    <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav">
-        <li class="active"><a href="/"><b>Home </b><span class="sr-only">(current)</span></a></li>
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> <b>Login/Register </b><span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            
-            <li role="separator" class="divider"></li>
-            <li><a href="/users/login"> <b>Login</b> </a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="/users/register"><b>Register</b></a></li>
+          <ul class="nav navbar-nav navbar-right">
+              <li>
+                 <a href="/users/login">
+                     Login
+                  </a>
+              </li>
+              <li>
+                  <a href="/users/register">
+                      Register
+                  </a>
+              </li>
           </ul>
-        </li>
-        <li><a href="/users/logout"><b>Logout</b></a></li>
-      </ul>
-    </div><!-- /.navbar-collapse -->
+      </div>
   </div>
-  <div>
-    <%- messages() %>
-  </div>
-      
- 
-  
-  
+</nav>
 
-  
   <script src="/javascripts/bootstrap.js"></script>
   <script src="/javascripts/jquery-3.2.1.js"></script>
-  

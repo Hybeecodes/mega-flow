@@ -24,42 +24,16 @@
 
   <body>
 
-    <% if(user){ %>
-      <%- include('partials/header') %>
-    <% }else{ %>
-      <%- include('partials/not_user_header') %>
-    <% } %>
-     <!-- Navigation -->
-     <!-- <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
-      <a class="navbar-brand" href="index.html">Start Bootstrap</a>
-      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-        Menu
-        <i class="fa fa-bars"></i>
-      </button>
-      <div class="collapse navbar-collapse navbar-right" id="navbarResponsive">
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="/">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/login">Login/Register</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/view_recent_posts">View recent posts</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/contact">Contact</a>
-          </li>
-        </ul>
-      </div>
-    </nav> -->
+      <%- include('./partials/not_user_header') %>
+    
+     
 
     <!-- Page Header -->
     <header class="masthead" style="background-image: url('images/home-bg.jpg')">
       <div class="container">
         <div class="row">
           <div class="col-lg-8 col-md-10 mx-auto">
-            <div class="site-heading ">
+            <div class="site-heading " style="margin-left:50px">
               <h1 class="text-center"> Mega Flow</h1>
               <marquee behavior="" direction="">
                 <span class="subheading">You can be changed by what you see</span>
