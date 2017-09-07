@@ -39,7 +39,7 @@ router.get('/get_post/:id',function(req,res,next){
   if(req.user){
     posts.findOne({_id:req.params.id},function(err,post){
       if(err) throw err;
-      res.render('posts/post',{title:'View Post',post:post,user:req.user});
+      res.render('posts/post',{title:'View Post',post:post,user:req.user,name:'myPost'});
     });
   }else{
     res.send('You are not authorized to view this page');

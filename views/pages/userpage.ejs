@@ -33,7 +33,7 @@
                               <% var body = post.body.substring(0,230); %>
                               <p class="card-text"><%= body %>...</p>
                               
-                              <a href="/posts/get_post/<%= post._id%>" class="btn btn-primary">Read More &rarr;</a>
+                              <a href="/pages/<%= post.author %>/<%= post._id%>" class="btn btn-primary">Read More &rarr;</a>
                           </div>
                           <div class="card-footer text-muted">                              
                              <p> Posted by <a href="#"> <%= post.author %> </a> on  <%= moment(post.date).format("MM-DD-YYYY") %>  </p>
