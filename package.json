@@ -23,6 +23,8 @@
     "express-paginate": "^0.3.0",
     "express-session": "^1.15.5",
     "express-validator": "^3.2.1",
+    "jquery": "^3.2.1",
+    "jquery-validity": "^3.0.0",
     "jsonwebtoken": "^7.4.3",
     "moment": "^2.18.1",
     "mongo-paginate": "^1.1.0",

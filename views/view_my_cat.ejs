@@ -23,11 +23,17 @@
     
             
              <div class="jumbotron">
+                 <% if(cats.length>0){ %>
                     <ul class="list-group">
-                    <% cats.forEach(function(cat){ %>  
-                    <li class="list-group-item"><%= cat.cat_name %> <span class="badge">0</span></li>
-                    <% }) %>
-                </ul> 
+                            <% cats.forEach(function(cat){ %>  
+                            <li class="list-group-item"><%= cat.cat_name %> <span class="badge">0</span></li>
+                            <% }) %>
+                        </ul> 
+                <% }else{ %>
+                   <h3> You have not created any Category. <a href="/categories/add_cat">Create one now </a></h3> 
+                <% } %>
+
+                  
                         
              </div>
              <%- include('./partials/footer') %>

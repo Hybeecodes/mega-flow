@@ -28,7 +28,7 @@ var users = require('./routes/users');
 var posts = require('./routes/posts');
 var categories = require('./routes/categories')
 
-var csrfProtection = csrf({ cookie: true })
+// var csrfProtection = csrf({ cookie: true })
 
 var app = express();
 app.locals.moment = require('moment');
@@ -53,7 +53,7 @@ app.use(cookieParser());
 app.use(session({
   secret: 'keyboard cat',
   cookie: {
-    maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week 
+    maxAge: 1000 * 60 * 60 * 24  // 1 day 
   },
   store: store,
   resave: true,
@@ -63,6 +63,12 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+// app.use(csrf);
+// app.use(function(req, res, next){
+//   res.locals._csrfToken = req.csrfToken();
+//   next();
+//   });
 
 app.use(function(req, res, next){
   // if there's a flash message, transfer

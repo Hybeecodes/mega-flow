@@ -5,6 +5,18 @@ var db =require('monk')('localhost/nodeblog');
 var posts = db.get('posts');
 var categories = db.get('categories');
 var Paginate = require('mongo-paginate');
+var multer = require('multer');
+
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './public/images/post_uploads')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now())
+  }
+});
+var upload = multer({ storage: storage })
 
 
 
@@ -23,7 +35,7 @@ router.get('/', function(req, res, next) {
   
 
 //get post by id
-router.get('/get_post_by_id/:id',function(req,res,next){
+router.get('/get_post/:id',function(req,res,next){
   if(req.user){
     posts.findOne({_id:req.params.id},function(err,post){
       if(err) throw err;
@@ -32,8 +44,6 @@ router.get('/get_post_by_id/:id',function(req,res,next){
   }else{
     res.send('You are not authorized to view this page');
   }
-    
-    
   });
   
   router.get('/add_post',function(req,res,next){
@@ -48,13 +58,16 @@ router.get('/get_post_by_id/:id',function(req,res,next){
     
   });
   
-  router.post('/add_post',function(req,res,next){
+  router.post('/add_post',upload.single('post_img'),function(req,res,next){
     
     req.checkBody('title','title field is required').notEmpty();
     req.checkBody('body','details field is required').notEmpty();
   
     req.getValidationResult().then(function(result) {
+      
+        // result.array().push({'params':'post_img','msg':'no image','value':''});
       if (!result.isEmpty()) {
+        console.log(result.array())
         categories.find({cat_author:req.user.username},function(err,categories){
           res.render('posts/add_post',{title:'Mega Flow - Add Post', categories:categories,errors:result.array(),user:req.user,name:'addPost'});
       });
@@ -62,15 +75,21 @@ router.get('/get_post_by_id/:id',function(req,res,next){
         var title = req.body.title;
         var category_id = req.body.category;
         var body = req.body.body;
-        var author_id = req.user._id;
+        var author = req.user.username;
         var date = new Date();
+        if(req.file){
+          var post_img = req.file;
+        }else{
+          var post_img = '';
+        }
         
         posts.insert({
           title:title,
-          category:category,
+          category_id:category_id,
           body:body,
-          author:author_id,
-          date:date
+          author:author,
+          date:date,
+          post_img:post_img
         },function(err,post){
           if (err){
             console.log('error adding post');
@@ -78,7 +97,7 @@ router.get('/get_post_by_id/:id',function(req,res,next){
           }
             
           else{
-            res.redirect('/posts');
+            res.redirect('/posts/my_posts');
           }
         })
       }  
@@ -95,10 +114,16 @@ router.get('/get_posts_by_category/:cat',function(req,res,next){
 });
 
 // get posts by user
-router.get('/get_by_user/:user',function(req,res,next){
-  posts.find({author:req.params.user},function(err,post){
-    
+router.get('/my_posts',function(req,res,next){
+  if(req.user){
+  posts.find({author:req.user.username},function(err,result){
+    categories.find({},{},function(err,cat){
+      res.render('posts/my_posts',{title:'MegaFlow - View Posts',name:'myPosts',posts:result, user:req.user,categories:cat});
+    })
   })
+}else{
+  res.send('You are not authorized to view posts');
+}
 })
 
 

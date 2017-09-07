@@ -18,7 +18,7 @@
                         <div class="col-lg-8">
             
                             <!-- Title -->
-                            <h1 class="mt-4"> <%= post.title %> </h1>
+                            <h1 class="mt-4"><b> <%= post.title %> </b></h1>
             
                             <!-- Author -->
                             <p class="lead">
@@ -32,9 +32,10 @@
             
                             <hr>
             
-                            <!-- Preview Image -->
-                            <img class="img-fluid rounded img-responsive" src="http://media.istockphoto.com/photos/athlete-running-picture-id636887598?k=6&m=636887598&s=612x612&w=0&h=40MkJYaC-wX6SmNEHgidDYbWZPFLEP03ALfeRSp4OSc=" alt="">
-            
+                            <% if(post.post_img != ''){ %>
+                                <% var img = post.post_img.path.substring(6); %>
+                                <img class="card-img-top img-responsive" src="<%= img %>" alt="Card image cap">
+                              <% } %>
                             <hr>
             
                             <!-- Post Content -->

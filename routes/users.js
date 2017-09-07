@@ -13,8 +13,9 @@ const passwoid = require('passwoid');
 const jwt = require('jsonwebtoken');
 const csrf = require('csurf');
 
+
 var csrfProtection = csrf({ cookie: true });
-// router.use(csrfProtection);
+ router.use(csrfProtection);
 
 
 
@@ -69,7 +70,7 @@ router.get('/dashboard',function(req,res){
 
 router.get('/login',function(req,res,next){
   //console.log(req.session);
-  res.render('users/login',{title:'Mega Flow - Login',errors:false});
+  res.render('users/login',{title:'Mega Flow - Login',errors:false,csrfToken:req.csrfToken()});
 });
 
 passport.use(new LocalStrategy(
@@ -97,7 +98,15 @@ passport.use(new LocalStrategy(
 }
 ));
 
+router.post('/update_profile',function(req,res,next){
+  // validate input
+  req.checkBody('blog_name','enter a blog page name').notEmpty();
+  req.checkBody('username','please fill in a username').notEmpty();
+
+})
+
 router.get('/profile',function(req,res,next){
+  console.log(req.session.passport.user);
   if(req.user){
     res.render('users/profile',{user:req.user,title:'MegaFlow - profile', name:'profile'});
   }else{
@@ -123,20 +132,23 @@ router.post('/login',passport.authenticate('local',{
 
 
 router.get('/logout',function(req,res){
-  req.session.destroy(function(err) {
-    if(err) {
-      console.log(err);
-    } else {
-      console.log('you just logged out');
-      res.redirect('/users/login');
-      console.log(req.session);
-    }
-  });
+  // req.session.destroy(function(err) {
+  //   if(err) {
+  //     console.log(err);
+  //   } else {
+  //     console.log('you just logged out');
+  //     res.redirect('/users/login');
+  //     console.log(req.session);
+  //   }
+  // });
+  req.logout();
+  res.redirect('/users/login');
+
   });
 
 
 router.get('/register',function(req,res,next){
-  res.render('users/register',{title:'Mega Flow - Register',errors:false,success:false});
+  res.render('users/register',{title:'Mega Flow - Register',errors:false,success:false,csrfToken:req.csrfToken()});
 });
 
 router.post('/register',upload.single('photo'),function(req,res,next){
@@ -159,7 +171,7 @@ router.post('/register',upload.single('photo'),function(req,res,next){
 
   req.getValidationResult().then(function(result){
     if(!result.isEmpty()){
-      res.render('users/register',{title:'Mega Flow - Register',errors:result.array(),success:false});
+      res.render('users/register',{title:'Mega Flow - Register',errors:result.array(),success:false,csrfToken:req.csrfToken()});
     }else{
       var firstname = req.body.firstname;
       var lastname = req.body.lastname;
@@ -177,7 +189,7 @@ router.post('/register',upload.single('photo'),function(req,res,next){
               msg:'Username Already exists '
             }
           ]
-          res.render('users/register',{title:'Mega Flow - Register',errors:errors,success:false});
+          res.render('users/register',{title:'Mega Flow - Register',errors:errors,success:false,csrfToken:req.csrfToken()});
         }else{
           users.findOne({email:email},function(err,user){
             if(user){
@@ -186,7 +198,7 @@ router.post('/register',upload.single('photo'),function(req,res,next){
                   msg:'Email Already exists '
                 }
               ]
-              res.render('users/register',{title:'Mega Flow - Register',errors:errors,success:false});
+              res.render('users/register',{title:'Mega Flow - Register',errors:errors,success:false,csrfToken:req.csrfToken()});
               return;
             }else{
               users.insert({
@@ -201,7 +213,7 @@ router.post('/register',upload.single('photo'),function(req,res,next){
                 if(err){
                   console.log('error saving user')
                 }else{
-                  res.render('users/register',{title:'Mega Flow - Register',errors:false,success:true});
+                  res.render('users/register',{title:'Mega Flow - Register',errors:false,success:true,csrfToken:req.csrfToken()});
                   // send confirmation email
                   var mailOptions = {
                     from: 'My Catalogue ',
@@ -218,7 +230,10 @@ router.post('/register',upload.single('photo'),function(req,res,next){
                       res.render('index',{message:'Confirmation message has been sent your email', title:'My Catalogue'});
                     }
                   })
-                  res.redirect(301,'index');
+                  req.login(user, function(err) {
+                    if (err) { return next(err); }
+                    return res.redirect(303,'/users/dashboard');
+                  });
                 }
               })
         
@@ -235,7 +250,7 @@ router.post('/register',upload.single('photo'),function(req,res,next){
 });
 
 router.get('/reset_password',function(req,res,next){
-  res.render('users/reset_password',{title:'Mega Flow - Reset Password',errors:false, success:false});
+  res.render('users/reset_password',{title:'Mega Flow - Reset Password',errors:false, success:false,csrfToken:req.csrfToken()});
 })
 
 //forgot password
@@ -279,11 +294,35 @@ router.post('/reset_password',function(req,res,next){
 
 //change password
 router.get('/change_password',function(req,res,next){
-  res.render('users/change_password',{title:'Mega Flow - Change Password'});
+  res.render('users/change_password',{title:'Mega Flow - Change Password',name:'changePass',errors:false,csrfToken:req.csrfToken()});
 });
 
 router.post('/change_password',function(req,res,next){
+
   // validate inputs
+  req.checkBody('password1','please enter your old password').notEmpty();
+  req.checkBody('password2','please enter your new password').notEmpty();
+  req.checkBody('password3','Please confirm your new password').equals(req.body.password2);
+
+ 
+  req.getValidationResult().then(function(result){
+
+    if(!result.isEmpty()){
+      console.log(result.array())
+      res.render('users/change_password',{title:'Mega Flow - Change Password',errors:result.array(),success:false,name:'changePass'});
+
+    }else{
+      var password = bcrypt.hashSync(req.body.password2);
+      users.update({email: req.user.email}, {$set:{password:password}},function(err,result){
+        if(err){
+          console.log('error updating user password');
+        }
+        else{
+          res.render('users/change_password',{title:'Mega Flow - Change Password',errors:false,success:true,name:'changePass'});
+        }
+      })
+    }
+  })
   
 })
 // get user profile by id
