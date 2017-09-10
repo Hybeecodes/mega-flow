@@ -48,8 +48,8 @@ router.get('/get_post/:id',function(req,res,next){
   
   router.get('/add_post',function(req,res,next){
     if(req.user){
-      categories.find({},{},function(err,categories){
-        res.render('posts/add_post',{title:'Mega Flow - Add Post', categories:categories,errors:false,user:req.user,name:'addPost'});
+      categories.find({cat_author:req.user.username},function(err,result){
+        res.render('posts/add_post',{title:'Mega Flow - Add Post', categories:result,errors:false,user:req.user,name:'addPost'});
     });
     }else{
       res.send('you can only add post as a user');
@@ -68,8 +68,8 @@ router.get('/get_post/:id',function(req,res,next){
         // result.array().push({'params':'post_img','msg':'no image','value':''});
       if (!result.isEmpty()) {
         console.log(result.array())
-        categories.find({cat_author:req.user.username},function(err,categories){
-          res.render('posts/add_post',{title:'Mega Flow - Add Post', categories:categories,errors:result.array(),user:req.user,name:'addPost'});
+        categories.find({cat_author:req.user.username},function(err,result){
+          res.render('posts/add_post',{title:'Mega Flow - Add Post', categories:result,errors:result.array(),user:req.user,name:'addPost'});
       });
       }else{
         var title = req.body.title;

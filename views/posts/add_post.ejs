@@ -6,15 +6,18 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>    
-    <%- include('../partials/user-side-nav') %>
+      <div class="container">
+            <%- include('../partials/user-side-nav') %>
+      
     
     <!-- Page Content -->
-        <div class="container">
+        <div class="container" style="height:70%;">
             <%- include('../partials/header') %>
+            
             
             <form accept-charset="UTF-8" method="POST" action="/posts/add_post" enctype="multipart/form-data" role="form">
                 
-                <div class="row">
+                <div class="row-md-12">
                         <center>
                              <h3>Add New Post </h3>
                             
@@ -45,6 +48,7 @@
                               
                             </select>
                     </div>
+                    
                         <div class="col-md-6 col-md-offset-3">
                             <div class="form-group label-floating">
                                 <label class="control-label">Post Details</label>
@@ -52,6 +56,7 @@
     
                             </div>
                         </div>
+
                         <div class="col-md-6 col-md-offset-3">
                         <div class="form-group">
                             <label for="picture">Upload a picture (optional)</label>
@@ -65,11 +70,11 @@
                 
                 <div class="clearfix"></div>
             </form>
-              
+            <%- include('../partials/footer') %>
         </div>
           <!-- /.container -->
-
-    <%- include('../partials/footer') %>
+        </div>
+    
     <!-- <script src="/ckeditor2/ckeditor.js"></script> -->
     <!-- <script>
         CKEDITOR.replace('body');
