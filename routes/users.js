@@ -5,6 +5,7 @@ const mongo = require('mongodb');
 var db =require('monk')('localhost/nodeblog');
 var multer = require('multer');
 var users = db.get('users');
+var userInfo = db.get('userInfo');
 var bcrypt = require('bcrypt-nodejs');
 const nodemailer = require('nodemailer');
 var passport = require('passport');
@@ -100,15 +101,91 @@ passport.use(new LocalStrategy(
 
 router.post('/update_profile',function(req,res,next){
   // validate input
-  req.checkBody('blog_name','enter a blog page name').notEmpty();
-  req.checkBody('username','please fill in a username').notEmpty();
+  // req.checkBody('blog_name','enter a blog page name').notEmpty();
+  // req.checkBody('username','please fill in a username').notEmpty();
+
+  if(req.user){
+    var blogname = req.body.blogname;
+    var username = req.body.username;
+    var email= req.body.email;
+    var firstname = req.body.firstname;
+    var lastname = req.body.lastname;
+    var address = req.body.address;
+    var city = req.body.city;
+    var country = req.body.country;
+    var postal_code = req.body.postal_code;
+    var facebook = req.body.facebook;
+    var twitter = req.body.twitter;
+    var instagram = req.body.instagram;
+    var about = req.body.about;
+
+    //check if user info exist
+    userInfo.findOne({email:req.user.email},function(err,user){
+      if(err) throw err;
+      if(user){
+        // user info exists then update
+        userInfo.update({email: email},
+           {$set:{
+             blogname:blogname,
+             username:username,
+             email:email,
+             firstname:firstname,
+             lastname:lastname,
+             address:address,
+             city:city,
+             country:country,
+             zipcode:zipcode,
+             facebook:facebook,
+             twitter:twitter,
+             instagram:instagram,
+             about:about
+            }},function(err,result){
+              if(err){
+                console.log('error updating your profile');
+              }else{
+                console.log(req.user.username+"'s profile was updated successfully");
+                res.render('users/profile',{user:req.user,title:'MegaFlow - profile', name:'profile',updateSuccess:true});
+              }
+        });
+      }else{
+        // user info doesn't exist, so create one
+        userInfo.insert(
+          {
+            blogname:blogname,
+            username:username,
+            email:email,
+            firstname:firstname,
+            lastname:lastname,
+            address:address,
+            city:city,
+            country:country,
+            postal_code:postal_code,
+            facebook:facebook,
+            twitter:twitter,
+            instagram:instagram,
+            about:about
+           },function(err,result){
+             if(err){
+               console.log('error updating your profile');
+             }else{
+               console.log(req.user.username+"'s profile was updated successfully");
+               res.render('users/profile',{user:req.user,title:'MegaFlow - profile', name:'profile',updateSuccess:true});
+             }
+       });
+
+      }
+    })
+  }else{
+    res.send('you are not authorized  to view this page');
+  }
+
 
 })
 
 router.get('/profile',function(req,res,next){
   console.log(req.session.passport.user);
   if(req.user){
-    res.render('users/profile',{user:req.user,title:'MegaFlow - profile', name:'profile'});
+    res.render('users/profile',{user:req.user,title:'MegaFlow - profile', name:'profile',csrfToken:req.csrfToken()});
   }else{
     res.send('You are not even logged in, which profile do you want to check???')
   } 

@@ -45,6 +45,7 @@ router.get('/get_post/:id',function(req,res,next){
     res.send('You are not authorized to view this page');
   }
   });
+  
 
 router.get('/:username/:post_id',function(req,res,next){
     posts.find({author:req.params.username,_id:req.params.post_id},function(err,result){
