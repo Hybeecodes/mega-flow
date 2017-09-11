@@ -113,11 +113,21 @@ router.post('/update_profile',function(req,res,next){
     var address = req.body.address;
     var city = req.body.city;
     var country = req.body.country;
-    var postal_code = req.body.postal_code;
+    var zipcode = req.body.zipcode;
     var facebook = req.body.facebook;
     var twitter = req.body.twitter;
     var instagram = req.body.instagram;
     var about = req.body.about;
+    if(req.file){
+      var newPhoto = req.file;
+      users.update({email:email},{$set:{photo:newPhoto}},function(err,result){
+        if(err){
+          res.send('error updating picture');
+        }else{
+          console.log('user picture updated successfully');
+        }
+      })
+    }
 
     //check if user info exist
     userInfo.findOne({email:req.user.email},function(err,user){
@@ -144,7 +154,7 @@ router.post('/update_profile',function(req,res,next){
                 console.log('error updating your profile');
               }else{
                 console.log(req.user.username+"'s profile was updated successfully");
-                res.render('users/profile',{user:req.user,title:'MegaFlow - profile', name:'profile',updateSuccess:true});
+                res.render('users/profile',{user:req.user,title:'MegaFlow - profile', name:'profile',updateSuccess:true,csrfToken:req.csrfToken()});
               }
         });
       }else{
@@ -159,7 +169,7 @@ router.post('/update_profile',function(req,res,next){
             address:address,
             city:city,
             country:country,
-            postal_code:postal_code,
+            postal_code:zipcode,
             facebook:facebook,
             twitter:twitter,
             instagram:instagram,
@@ -169,7 +179,7 @@ router.post('/update_profile',function(req,res,next){
                console.log('error updating your profile');
              }else{
                console.log(req.user.username+"'s profile was updated successfully");
-               res.render('users/profile',{user:req.user,title:'MegaFlow - profile', name:'profile',updateSuccess:true});
+               res.render('users/profile',{user:req.user,title:'MegaFlow - profile', name:'profile',updateSuccess:true,csrfToken:req.csrfToken()});
              }
        });
 

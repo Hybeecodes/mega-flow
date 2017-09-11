@@ -50,7 +50,7 @@
                             <div class="content">
                                 <form class="my-form" action="/users/update_profile" method="post">
                                     <div class="row">
-                                        <div class="col-md-5">5
+                                        <div class="col-md-5">
                                             <div class="form-group">
                                                 <label>Your blog Page Name</label>
                                                 <input type="text" class="form-control" placeholder="blog page name"
@@ -152,7 +152,7 @@
                                     <div class="row">
                                             <div class="col-md-4">
                                                 <div class="form-group">
-                                                    <label>Facebook</label>
+                                                    <label><%=user.facebook %></label>
                                                     <input type="text" class="form-control" placeholder="facebook"
                                                     <% if(user.facebook){ %>
                                                         value="<%=user.facebook %>"
