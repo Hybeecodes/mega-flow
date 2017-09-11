@@ -99,7 +99,7 @@ passport.use(new LocalStrategy(
 }
 ));
 
-router.post('/update_profile',function(req,res,next){
+router.post('/profile',function(req,res,next){
   // validate input
   // req.checkBody('blog_name','enter a blog page name').notEmpty();
   // req.checkBody('username','please fill in a username').notEmpty();
@@ -154,7 +154,7 @@ router.post('/update_profile',function(req,res,next){
                 console.log('error updating your profile');
               }else{
                 console.log(req.user.username+"'s profile was updated successfully");
-                res.render('users/profile',{user:req.user,title:'MegaFlow - profile', name:'profile',updateSuccess:true,csrfToken:req.csrfToken()});
+                res.render('users/profile',{user:req.user,userInfo:result,title:'MegaFlow - profile', name:'profile',updateSuccess:true,csrfToken:req.csrfToken()});
               }
         });
       }else{
@@ -179,7 +179,7 @@ router.post('/update_profile',function(req,res,next){
                console.log('error updating your profile');
              }else{
                console.log(req.user.username+"'s profile was updated successfully");
-               res.render('users/profile',{user:req.user,title:'MegaFlow - profile', name:'profile',updateSuccess:true,csrfToken:req.csrfToken()});
+               res.render('users/profile',{user:req.user,userInfo:result,title:'MegaFlow - profile', name:'profile',updateSuccess:true,csrfToken:req.csrfToken()});
              }
        });
 
@@ -195,7 +195,10 @@ router.post('/update_profile',function(req,res,next){
 router.get('/profile',function(req,res,next){
   console.log(req.session.passport.user);
   if(req.user){
-    res.render('users/profile',{user:req.user,title:'MegaFlow - profile', name:'profile',csrfToken:req.csrfToken()});
+    userInfo.findOne({email:req.user.email},function(err,result){
+      res.render('users/profile',{user:req.user,userInfo:result,title:'MegaFlow - profile', name:'profile',csrfToken:req.csrfToken()});
+    })
+    
   }else{
     res.send('You are not even logged in, which profile do you want to check???')
   } 
