@@ -15,8 +15,8 @@ const jwt = require('jsonwebtoken');
 const csrf = require('csurf');
 
 
-var csrfProtection = csrf({ cookie: true });
- router.use(csrfProtection);
+// var csrfProtection = csrf({ cookie: true });
+//  router.use(csrfProtection);
 
 
 
@@ -71,7 +71,7 @@ router.get('/dashboard',function(req,res){
 
 router.get('/login',function(req,res,next){
   //console.log(req.session);
-  res.render('users/login',{title:'Mega Flow - Login',errors:false,csrfToken:req.csrfToken()});
+  res.render('users/login',{title:'Mega Flow - Login',errors:false});
 });
 
 passport.use(new LocalStrategy(
@@ -99,7 +99,7 @@ passport.use(new LocalStrategy(
 }
 ));
 
-router.post('/profile',function(req,res,next){
+router.post('/profile',upload.single('photo'),function(req,res,next){
   // validate input
   // req.checkBody('blog_name','enter a blog page name').notEmpty();
   // req.checkBody('username','please fill in a username').notEmpty();
@@ -119,22 +119,18 @@ router.post('/profile',function(req,res,next){
     var instagram = req.body.instagram;
     var about = req.body.about;
     if(req.file){
-      var newPhoto = req.file;
-      users.update({email:email},{$set:{photo:newPhoto}},function(err,result){
-        if(err){
-          res.send('error updating picture');
-        }else{
-          console.log('user picture updated successfully');
-        }
-      })
+      var photo = req.file;
+      
+    }else{
+      var photo = req.user.photo;
     }
 
     //check if user info exist
-    userInfo.findOne({email:req.user.email},function(err,user){
+    users.findOne({email:req.user.email},function(err,user){
       if(err) throw err;
       if(user){
         // user info exists then update
-        userInfo.update({email: email},
+        users.update({email: email},
            {$set:{
              blogname:blogname,
              username:username,
@@ -148,18 +144,19 @@ router.post('/profile',function(req,res,next){
              facebook:facebook,
              twitter:twitter,
              instagram:instagram,
-             about:about
+             about:about,
+             photo:photo
             }},function(err,result){
               if(err){
                 console.log('error updating your profile');
               }else{
                 console.log(req.user.username+"'s profile was updated successfully");
-                res.render('users/profile',{user:req.user,userInfo:result,title:'MegaFlow - profile', name:'profile',updateSuccess:true,csrfToken:req.csrfToken()});
+                res.redirect(303,'/users/profile');
               }
         });
       }else{
         // user info doesn't exist, so create one
-        userInfo.insert(
+        users.insert(
           {
             blogname:blogname,
             username:username,
@@ -173,13 +170,14 @@ router.post('/profile',function(req,res,next){
             facebook:facebook,
             twitter:twitter,
             instagram:instagram,
-            about:about
+            about:about,
+            photo:photo
            },function(err,result){
              if(err){
                console.log('error updating your profile');
              }else{
                console.log(req.user.username+"'s profile was updated successfully");
-               res.render('users/profile',{user:req.user,userInfo:result,title:'MegaFlow - profile', name:'profile',updateSuccess:true,csrfToken:req.csrfToken()});
+               res.redirect(303,'/users/profile');
              }
        });
 
@@ -193,10 +191,11 @@ router.post('/profile',function(req,res,next){
 })
 
 router.get('/profile',function(req,res,next){
-  console.log(req.session.passport.user);
+  // console.log(req.session.passport.user);
+  console.log(req.user)
   if(req.user){
-    userInfo.findOne({email:req.user.email},function(err,result){
-      res.render('users/profile',{user:req.user,userInfo:result,title:'MegaFlow - profile', name:'profile',csrfToken:req.csrfToken()});
+    users.findOne({email:req.user.email},function(err,result){
+      res.render('users/profile',{user:req.user,userInfo:result,title:'MegaFlow - profile', name:'profile'});
     })
     
   }else{
@@ -238,7 +237,7 @@ router.get('/logout',function(req,res){
 
 
 router.get('/register',function(req,res,next){
-  res.render('users/register',{title:'Mega Flow - Register',errors:false,success:false,csrfToken:req.csrfToken()});
+  res.render('users/register',{title:'Mega Flow - Register',errors:false,success:false});
 });
 
 router.post('/register',upload.single('photo'),function(req,res,next){
@@ -261,7 +260,7 @@ router.post('/register',upload.single('photo'),function(req,res,next){
 
   req.getValidationResult().then(function(result){
     if(!result.isEmpty()){
-      res.render('users/register',{title:'Mega Flow - Register',errors:result.array(),success:false,csrfToken:req.csrfToken()});
+      res.render('users/register',{title:'Mega Flow - Register',errors:result.array(),success:false});
     }else{
       var firstname = req.body.firstname;
       var lastname = req.body.lastname;
@@ -279,7 +278,7 @@ router.post('/register',upload.single('photo'),function(req,res,next){
               msg:'Username Already exists '
             }
           ]
-          res.render('users/register',{title:'Mega Flow - Register',errors:errors,success:false,csrfToken:req.csrfToken()});
+          res.render('users/register',{title:'Mega Flow - Register',errors:errors,success:false});
         }else{
           users.findOne({email:email},function(err,user){
             if(user){
@@ -288,7 +287,7 @@ router.post('/register',upload.single('photo'),function(req,res,next){
                   msg:'Email Already exists '
                 }
               ]
-              res.render('users/register',{title:'Mega Flow - Register',errors:errors,success:false,csrfToken:req.csrfToken()});
+              res.render('users/register',{title:'Mega Flow - Register',errors:errors,success:false});
               return;
             }else{
               users.insert({
@@ -303,26 +302,26 @@ router.post('/register',upload.single('photo'),function(req,res,next){
                 if(err){
                   console.log('error saving user')
                 }else{
-                  res.render('users/register',{title:'Mega Flow - Register',errors:false,success:true,csrfToken:req.csrfToken()});
+                  res.render('users/register',{title:'Mega Flow - Register',errors:false,success:true});
                   // send confirmation email
                   var mailOptions = {
-                    from: 'My Catalogue ',
+                    from: 'MegaFlow ',
                     to: email,
                     subject:'Registration Confirlmation',
                     text:'Your registration on MegaFlow was successful'
                   };
-            
+                  
                   transporter.sendMail(mailOptions,function(err,info){
                     if(err){
                       console.log(err);
                     }else{
                       console.log('Email Sent');
-                      res.render('index',{message:'Confirmation message has been sent your email', title:'My Catalogue'});
+                      res.render('index',{message:'Confirmation message has been sent your email', title:'Mega Flow'});
                     }
                   })
                   req.login(user, function(err) {
                     if (err) { return next(err); }
-                    return res.redirect(303,'/users/dashboard');
+                     res.redirect(303,'/users/dashboard');
                   });
                 }
               })
@@ -331,16 +330,13 @@ router.post('/register',upload.single('photo'),function(req,res,next){
           });
         }
       })
-      
-      
-
          }
   });
 
 });
 
 router.get('/reset_password',function(req,res,next){
-  res.render('users/reset_password',{title:'Mega Flow - Reset Password',errors:false, success:false,csrfToken:req.csrfToken()});
+  res.render('users/reset_password',{title:'Mega Flow - Reset Password',errors:false, success:false});
 })
 
 //forgot password
@@ -384,7 +380,7 @@ router.post('/reset_password',function(req,res,next){
 
 //change password
 router.get('/change_password',function(req,res,next){
-  res.render('users/change_password',{title:'Mega Flow - Change Password',name:'changePass',errors:false,csrfToken:req.csrfToken()});
+  res.render('users/change_password',{title:'Mega Flow - Change Password',name:'changePass',errors:false});
 });
 
 router.post('/change_password',function(req,res,next){

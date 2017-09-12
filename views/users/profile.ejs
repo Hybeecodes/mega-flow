@@ -48,7 +48,7 @@
                                 <h4 class="title">Edit Profile</h4>
                             </div>
                             <div class="content">
-                                <form class="my-form" action="/users/profile" method="post">
+                                <form class="my-form" action="/users/profile" method="post" enctype="multipart/form-data" role="form">
                                     <div class="row">
                                         <div class="col-md-5">
                                             <div class="form-group">
@@ -201,15 +201,11 @@
                                             <div class="form-group">
                                                 <label>About You</label>
                                                 <textarea rows="5" class="form-control" placeholder="Here can be your description"
-                                                 name="about">
-                                                 <% if(userInfo.about){ %>
-                                                    <%=userInfo.about %>
-                                                <% } %>
-                                                </textarea>
+                                                 name="about"><% if(userInfo.about){ %><%=userInfo.about %><%}%></textarea>
                                             </div>
                                         </div>
                                     </div>
-                                    <input type="hidden" name="_csrf" value="<%=csrfToken%>">
+                                    
                                     <button type="submit" class="btn btn-info btn-fill pull-right">Update Profile</button>
                                     <div class="clearfix"></div>
 
