@@ -7,7 +7,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var mongo = require('mongodb');
-var db = require('monk')('localhost/nodeblog');
+var db = require('monk')('mongodb://mega:mega@ds147034.mlab.com:47034/mega-flow');
 var multer = require('multer');
 var flash = require('connect-flash');
 var passport = require('passport');
@@ -16,11 +16,11 @@ var csrf = require('csurf');
 var MongoDBStore = require('connect-mongodb-session')(session);
 
 // require('events').EventEmitter.prototype._maxListeners = 100;
-var store = new MongoDBStore(
-  {
-    uri: 'mongodb://localhost:27017/nodeblog',
-    collection: 'mySessions'
-  });
+// var store = new MongoDBStore(
+//   {
+//     uri: 'mongodb://localhost:27017/nodeblog',
+//     collection: 'mySessions'
+//   });
 
 
 var index = require('./routes/index');
@@ -39,10 +39,10 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 
-store.on('error', function(error) {
-  assert.ifError(error);
-  assert.ok(false);
-});
+// store.on('error', function(error) {
+//   assert.ifError(error);
+//   assert.ok(false);
+// });
 
 
 // uncomment after placing your favicon in /public
@@ -56,7 +56,7 @@ app.use(session({
   cookie: {
     maxAge: 1000 * 60 * 60 * 24  // 1 day 
   },
-  store: store,
+
   resave: true,
   saveUninitialized: true,
   // 
