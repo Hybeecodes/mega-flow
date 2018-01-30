@@ -2,7 +2,8 @@ var express = require('express');
 var router = express.Router();
 var app = require('../app');
 const mongo = require('mongodb');
-var db = require('monk')('mongodb://mega:mega@ds147034.mlab.com:47034/mega-flow');
+// var db = require('monk')('mongodb://mega:mega@ds147034.mlab.com:47034/mega-flow');
+var db = require('monk')('localhost/megaflow');
 var multer = require('multer');
 var users = db.get('users');
 var userInfo = db.get('userInfo');
@@ -212,7 +213,7 @@ router.post('/login',passport.authenticate('local',{
   failureRedirect:'/users/login',
   failureFlash:'Invalid username or password'
 }),function(req,res,next){
-  console.log('Authentication successful');
+  console.log(req.user);
   //  req.session.username = req.body.username; 
   req.flash('success','You are logged in');
   var user = req.user;
@@ -302,8 +303,6 @@ router.post('/register',upload.single('photo'),function(req,res,next){
                 if(err){
                   console.log('error saving user')
                 }else{
-                  res.render('users/register',{title:'Mega Flow - Register',errors:false,success:true});
-                  // send confirmation email
                   var mailOptions = {
                     from: 'MegaFlow ',
                     to: email,
@@ -316,9 +315,10 @@ router.post('/register',upload.single('photo'),function(req,res,next){
                       console.log(err);
                     }else{
                       console.log('Email Sent');
-                      res.render('index',{message:'Confirmation message has been sent your email', title:'Mega Flow'});
+                      res.render('users/register',{title:'Mega Flow - Register',errors:false,success:true});
+                      // send confirmation email
                     }
-                  })
+                  }) 
                   req.login(user, function(err) {
                     if (err) { return next(err); }
                      res.redirect(303,'/users/dashboard');

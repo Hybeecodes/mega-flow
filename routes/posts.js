@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
 const mongo = require('mongodb');
-var db = require('monk')('mongodb://mega:mega@ds147034.mlab.com:47034/mega-flow');
+// var db = require('monk')('mongodb://mega:mega@ds147034.mlab.com:47034/mega-flow');
+var db = require('monk')('localhost/megaflow');
 var posts = db.get('posts');
 var categories = db.get('categories');
 var Paginate = require('mongo-paginate');
@@ -121,9 +122,9 @@ router.get('/my_posts',function(req,res,next){
       res.render('posts/my_posts',{title:'MegaFlow - View Posts',name:'myPosts',posts:result, user:req.user,categories:cat});
     })
   })
-}else{
-  res.send('You are not authorized to view posts');
-}
+  }else{
+    res.send('You are not authorized to view posts');
+  }
 })
 
 

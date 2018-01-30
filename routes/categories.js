@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var db =require('monk')('localhost/nodeblog');
+var db =require('monk')('localhost/megaflow');
 var posts = db.get('posts');
 var categories = db.get('categories');
 var posts = db.get('posts');
