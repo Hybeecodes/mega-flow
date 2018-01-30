@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router();
 const mongo = require('mongodb');
-// var db = require('monk')('mongodb://mega:mega@ds147034.mlab.com:47034/mega-flow');
-var db = require('monk')('localhost/megaflow');
+var db = require('monk')('mongodb://mega:mega@ds147034.mlab.com:47034/mega-flow');
+// var db = require('monk')('localhost/megaflow');
 var posts = db.get('posts');
 var categories = db.get('categories');
 var Paginate = require('mongo-paginate');
