@@ -18,9 +18,9 @@
                 <form accept-charset="UTF-8" class="well" method="post" action="/users/login" role="form">
                     <h3>Please Login</h3>
                     <center>
-                       
-                    <% if(errors){ %>
-                        <% errors.forEach(function(error){ %>
+                       <% var messages = getMessages() %>
+                    <% if(messages.failure){ %>
+                        <% messages.failure.forEach(function(error){ %>
                             <div class="alert alert-danger" > <b>
                                <%= error.msg %>
                             </b>

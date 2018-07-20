@@ -55,8 +55,8 @@
                                                 <label>Your blog Page Name</label>
                                                 <input type="text" class="form-control" placeholder="blog page name"
                                         
-                                                 <% if(userInfo.blogname){ %>
-                                                    value="<%=userInfo.blogname %>"
+                                                 <% if(user.blogname){ %>
+                                                    value="<%=user.blogname %>"
                                                 <% }else{ %>
                                                     value=""
                                                 <% } %>
@@ -67,13 +67,13 @@
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label>Username</label>
-                                                <input type="text" class="form-control" placeholder="Username" value="<%= userInfo.username %>" name="username">
+                                                <input type="text" class="form-control" placeholder="Username" value="<%= user.username %>" name="username">
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="exampleInputEmail1">Email address</label>
-                                                <input type="email" class="form-control" placeholder="Email" value="<%= userInfo.email %>" name="email" >
+                                                <input type="email" class="form-control" placeholder="Email" value="<%= user.email %>" name="email" >
                                             </div>
                                         </div>
                                     </div>
@@ -82,13 +82,13 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>First Name</label>
-                                                <input type="text" class="form-control" placeholder="Firstname" value="<%= userInfo.firstname %>" name="firstname" >
+                                                <input type="text" class="form-control" placeholder="Firstname" value="<%= user.firstname %>" name="firstname" >
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Last Name</label>
-                                                <input type="text" class="form-control" placeholder="Last Name" value="<%= userInfo.lastname %>" name="lastname" >
+                                                <input type="text" class="form-control" placeholder="Last Name" value="<%= user.lastname %>" name="lastname" >
                                             </div>
                                         </div>
                                     </div>
@@ -99,8 +99,8 @@
                                                 <label>Address</label>
                                                 <input type="text" class="form-control" placeholder="Home Address"
                                                  
-                                                 <% if(userInfo.address){ %>
-                                                    value="<%=userInfo.address %>"
+                                                 <% if(user.address){ %>
+                                                    value="<%=user.address %>"
                                                 <% }else{ %>
                                                     value=""
                                                 <% } %>
@@ -114,8 +114,8 @@
                                             <div class="form-group">
                                                 <label>City</label>
                                                 <input type="text" class="form-control" placeholder="City"
-                                                <% if(userInfo.city){ %>
-                                                    value="<%=userInfo.city %>"
+                                                <% if(user.city){ %>
+                                                    value="<%=user.city %>"
                                                 <% }else{ %>
                                                     value=""
                                                 <% } %>
@@ -127,8 +127,8 @@
                                             <div class="form-group">
                                                 <label>Country</label>
                                                 <input type="text" class="form-control" placeholder="Country"
-                                                <% if(userInfo.country){ %>
-                                                    value="<%=userInfo.country %>"
+                                                <% if(user.country){ %>
+                                                    value="<%=user.country %>"
                                                 <% }else{ %>
                                                     value=""
                                                 <% } %>
@@ -139,8 +139,8 @@
                                             <div class="form-group">
                                                 <label>Postal Code</label>
                                                 <input type="number" class="form-control" placeholder="ZIP Code"
-                                                <% if(userInfo.zipcode){ %>
-                                                    value="<%=userInfo.zipcode %>"
+                                                <% if(user.zipcode){ %>
+                                                    value="<%=user.zipcode %>"
                                                 <% }else{ %>
                                                     value=""
                                                 <% } %>
@@ -154,8 +154,8 @@
                                                 <div class="form-group">
                                                     <label>facebook </label>
                                                     <input type="text" class="form-control" placeholder="facebook"
-                                                    <% if(userInfo.facebook){ %>
-                                                        value="<%=userInfo.facebook %>"
+                                                    <% if(user.facebook){ %>
+                                                        value="<%=user.facebook %>"
                                                     <% }else{ %>
                                                         value=""
                                                     <% } %>
@@ -166,8 +166,8 @@
                                                 <div class="form-group">
                                                     <label>Twitter</label>
                                                     <input type="text" class="form-control" placeholder="twitter"
-                                                    <% if(userInfo.twitter){ %>
-                                                        value="<%=userInfo.twitter %>"
+                                                    <% if(user.twitter){ %>
+                                                        value="<%=user.twitter %>"
                                                     <% }else{ %>
                                                         value=""
                                                     <% } %>
@@ -178,8 +178,8 @@
                                                 <div class="form-group">
                                                     <label>Instagram</label>
                                                     <input type="text" class="form-control" placeholder="Instagram"
-                                                    <% if(userInfo.instagram){ %>
-                                                        value="<%=userInfo.instagram %>"
+                                                    <% if(user.instagram){ %>
+                                                        value="<%=user.instagram %>"
                                                     <% }else{ %>
                                                         value=""
                                                     <% } %>
@@ -201,7 +201,7 @@
                                             <div class="form-group">
                                                 <label>About You</label>
                                                 <textarea rows="5" class="form-control" placeholder="Here can be your description"
-                                                 name="about"><% if(userInfo.about){ %><%=userInfo.about %><%}%></textarea>
+                                                 name="about"><% if(user.about){ %><%=user.about %><%}%></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -216,7 +216,7 @@
                     <div class="col-md-4">
                         <div class="card card-user">
                             <div class="image">
-                                <img src="https://ununsplash.imgix.net/photo-1431578500526-4d9613015464?fit=crop&fm=jpg&h=300&q=75&w=400" alt="..."/>
+                                <img src="/images/about-bg.jpg" alt="..."/>
                             </div>
                             <div class="content">
                                 <div class="author">
@@ -231,20 +231,19 @@
                                     <% } %>
                                     alt="..."/>
 
-                                      <h4 class="title"><%= userInfo.firstname%>    <%= userInfo.lastname%><br />
-                                         <small><%= userInfo.username%></small>
+                                      <h4 class="title"><%= user.firstname%>    <%= user.lastname%><br />
+                                         <small><%= user.username%></small>
                                       </h4>
                                     </a>
                                 </div>
-                                <p class="description text-center"> "Lamborghini Mercy <br>
-                                                    Your chick she so thirsty <br>
-                                                    I'm in that two seat Lambo"
+                                <p class="description text-center"> 
+                                        <% if(user.about){ %><%=user.about %><%}%>
                                 </p>
                             </div>
                             
                             <div class="text-center">
                                 <a <% if(user.facebook){ %>
-                                        href="userInfo.facebook"
+                                        href="user.facebook"
                                     <% }else{ %>
                                         href="https://www.facebook.com/"
                                     <% } %>>

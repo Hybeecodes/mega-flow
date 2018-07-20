@@ -2,27 +2,26 @@ var express = require('express');
 var router = express.Router();
 var app = require('../app');
 const mongo = require('mongodb');
-var db = require('monk')('mongodb://mega:mega@ds147034.mlab.com:47034/mega-flow');
+// var db = require('monk')('mongodb://mega:mega@ds147034.mlab.com:47034/mega-flow');
+require('../config/db_config');
 // var db = require('monk')('localhost/megaflow');
 var multer = require('multer');
-var users = db.get('users');
-var userInfo = db.get('userInfo');
+var users = require('../models/User');
+var userInfo = require('../models/UserInfo');
 var bcrypt = require('bcrypt-nodejs');
 const nodemailer = require('nodemailer');
-var passport = require('passport');
+const passport = require('../config/passport');
 // var LocalStrategy = require('passport-local').Strategy;
 const passwoid = require('passwoid');
 const jwt = require('jsonwebtoken');
 const csrf = require('csurf');
+const EnsureLoggedIn = require('../middleware/ensureLoggedIn');
+const UserController = require('../controllers/UserController');
 
 
 // var csrfProtection = csrf({ cookie: true });
 //  router.use(csrfProtection);
 
-
-
-var passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
 
 var transporter = nodemailer.createTransport({
   service: 'Gmail',
@@ -45,295 +44,25 @@ var storage = multer.diskStorage({
 });
 var upload = multer({ storage: storage })
 
-
-passport.serializeUser(function(user, done) {
-  done(null, user._id);
-});
- 
-passport.deserializeUser(function(id, done) {
-  users.findOne({_id:id}, function (err, user) {
-    done(err, user);
-  });
-});
-
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+router.get('/',UserController.getIndex);
 
-router.get('/dashboard',function(req,res){
-  if(req.user){
-    res.render('users/dashboard',{title:'MegaSlack - dashboard',user:req.user,name:'dashboard'});
-  }else{
-    res.send('You need to login to access this page');
-  }
-})
+router.get('/dashboard',UserController.getDashboard);
 
+router.get('/login',UserController.getLogin);
 
-router.get('/login',function(req,res,next){
-  //console.log(req.session);
-  res.render('users/login',{title:'Mega Flow - Login',errors:false});
-});
+router.post('/profile',UserController.updateProfile);
 
-passport.use(new LocalStrategy(
-  function(username,password,done){
-    // var collection = db.get('users');
-    users.findOne({username:username},function(err,user){
-      if(err){
-        throw err;
-      }
-      if(!user){
-        console.log('unknown user');
-        return done(null,false,{message:'unknown user'});
+router.get('/profile',UserController.getProfile);
 
-      }
-      if(user){
-        if(!bcrypt.compareSync(password,user.password)){
-          console.log('invalid password');
-          return done(null,false,{message:'Invalid password'});
-        }else{
-          return done(null,user);
-        }
-      }
-      
-    });
-}
-));
+router.post('/login',UserController.authenticateUser);
 
-router.post('/profile',upload.single('photo'),function(req,res,next){
-  // validate input
-  // req.checkBody('blog_name','enter a blog page name').notEmpty();
-  // req.checkBody('username','please fill in a username').notEmpty();
-
-  if(req.user){
-    var blogname = req.body.blogname;
-    var username = req.body.username;
-    var email= req.body.email;
-    var firstname = req.body.firstname;
-    var lastname = req.body.lastname;
-    var address = req.body.address;
-    var city = req.body.city;
-    var country = req.body.country;
-    var zipcode = req.body.zipcode;
-    var facebook = req.body.facebook;
-    var twitter = req.body.twitter;
-    var instagram = req.body.instagram;
-    var about = req.body.about;
-    if(req.file){
-      var photo = req.file;
-      
-    }else{
-      var photo = req.user.photo;
-    }
-
-    //check if user info exist
-    users.findOne({email:req.user.email},function(err,user){
-      if(err) throw err;
-      if(user){
-        // user info exists then update
-        users.update({email: email},
-           {$set:{
-             blogname:blogname,
-             username:username,
-             email:email,
-             firstname:firstname,
-             lastname:lastname,
-             address:address,
-             city:city,
-             country:country,
-             zipcode:zipcode,
-             facebook:facebook,
-             twitter:twitter,
-             instagram:instagram,
-             about:about,
-             photo:photo
-            }},function(err,result){
-              if(err){
-                console.log('error updating your profile');
-              }else{
-                console.log(req.user.username+"'s profile was updated successfully");
-                res.redirect(303,'/users/profile');
-              }
-        });
-      }else{
-        // user info doesn't exist, so create one
-        users.insert(
-          {
-            blogname:blogname,
-            username:username,
-            email:email,
-            firstname:firstname,
-            lastname:lastname,
-            address:address,
-            city:city,
-            country:country,
-            postal_code:zipcode,
-            facebook:facebook,
-            twitter:twitter,
-            instagram:instagram,
-            about:about,
-            photo:photo
-           },function(err,result){
-             if(err){
-               console.log('error updating your profile');
-             }else{
-               console.log(req.user.username+"'s profile was updated successfully");
-               res.redirect(303,'/users/profile');
-             }
-       });
-
-      }
-    })
-  }else{
-    res.send('you are not authorized  to view this page');
-  }
+router.get('/logout',UserController.logout);
 
 
-})
+router.get('/register',UserController.getRegister);
 
-router.get('/profile',function(req,res,next){
-  // console.log(req.session.passport.user);
-  console.log(req.user)
-  if(req.user){
-    users.findOne({email:req.user.email},function(err,result){
-      res.render('users/profile',{user:req.user,userInfo:result,title:'MegaFlow - profile', name:'profile'});
-    })
-    
-  }else{
-    res.send('You are not even logged in, which profile do you want to check???')
-  } 
-  
-})
-
-router.get('/image',function(req,res,next){
-  res.send(req.user.photo);
-})
-
-router.post('/login',passport.authenticate('local',{
-  failureRedirect:'/users/login',
-  failureFlash:'Invalid username or password'
-}),function(req,res,next){
-  console.log(req.user);
-  //  req.session.username = req.body.username; 
-  req.flash('success','You are logged in');
-  var user = req.user;
-  res.redirect(303,'/users/dashboard'); 
-})
-
-
-router.get('/logout',function(req,res){
-  // req.session.destroy(function(err) {
-  //   if(err) {
-  //     console.log(err);
-  //   } else {
-  //     console.log('you just logged out');
-  //     res.redirect('/users/login');
-  //     console.log(req.session);
-  //   }
-  // });
-  req.logout();
-  res.redirect('/users/login');
-
-  });
-
-
-router.get('/register',function(req,res,next){
-  res.render('users/register',{title:'Mega Flow - Register',errors:false,success:false});
-});
-
-router.post('/register',upload.single('photo'),function(req,res,next){
-
-  //validate inputs
-  req.checkBody('firstname','firstname is required').notEmpty();
-  req.checkBody('lastname','lastname is required').notEmpty();
-  req.checkBody('password','password is required').notEmpty();
-  req.checkBody('password2','passwords must be the same').equals(req.body.password);
-  req.checkBody('email','email is required').notEmpty();
-  req.checkBody('email','Enter a valid email').isEmail();
-  req.checkBody('username','username is required').notEmpty();
-   
-  // validate the profile picture
-  
-//   if (!req.file) {
-//     res.send('No files to upload.');
-//     return;
-// }
-
-  req.getValidationResult().then(function(result){
-    if(!result.isEmpty()){
-      res.render('users/register',{title:'Mega Flow - Register',errors:result.array(),success:false});
-    }else{
-      var firstname = req.body.firstname;
-      var lastname = req.body.lastname;
-      var password =bcrypt.hashSync(req.body.password);
-      var email = req.body.email;
-      var username = req.body.username;
-      var photo = req.file;
-      console.log(photo);
-
-      // check if user exists
-      users.findOne({username:username},function(err,user){
-        if(user){
-          var errors = [
-            {
-              msg:'Username Already exists '
-            }
-          ]
-          res.render('users/register',{title:'Mega Flow - Register',errors:errors,success:false});
-        }else{
-          users.findOne({email:email},function(err,user){
-            if(user){
-              var errors = [
-                {
-                  msg:'Email Already exists '
-                }
-              ]
-              res.render('users/register',{title:'Mega Flow - Register',errors:errors,success:false});
-              return;
-            }else{
-              users.insert({
-                firstname:firstname,
-                lastname:lastname,
-                password:password,
-                email:email,
-                username:username,
-                photo: photo
-              
-              },function(err,user){
-                if(err){
-                  console.log('error saving user')
-                }else{
-                  var mailOptions = {
-                    from: 'MegaFlow ',
-                    to: email,
-                    subject:'Registration Confirlmation',
-                    text:'Your registration on MegaFlow was successful'
-                  };
-                  
-                  transporter.sendMail(mailOptions,function(err,info){
-                    if(err){
-                      console.log(err);
-                    }else{
-                      console.log('Email Sent');
-                      res.render('users/register',{title:'Mega Flow - Register',errors:false,success:true});
-                      // send confirmation email
-                    }
-                  }) 
-                  req.login(user, function(err) {
-                    if (err) { return next(err); }
-                     res.redirect(303,'/users/dashboard');
-                  });
-                }
-              })
-        
-            }
-          });
-        }
-      })
-         }
-  });
-
-});
+router.post('/register',UserController.registerUser);
 
 router.get('/reset_password',function(req,res,next){
   res.render('users/reset_password',{title:'Mega Flow - Reset Password',errors:false, success:false});

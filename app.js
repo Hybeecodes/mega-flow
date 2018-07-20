@@ -6,15 +6,13 @@ var expressValidator = require('express-validator');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
-var mongo = require('mongodb');
-var db = require('monk')('mongodb://mega:mega@ds147034.mlab.com:47034/mega-flow');
-// var db = require('monk')('localhost/megaflow');
-var multer = require('multer');
-var flash = require('connect-flash');
+// var flash = require('connect-flash');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var csrf = require('csurf');
-var MongoDBStore = require('connect-mongodb-session')(session);
+require('./config/db_config');
+const flash = require('express-flash-messages');
+// var MongoDBStore = require('connect-mongodb-session')(session);
 
 // require('events').EventEmitter.prototype._maxListeners = 100;
 // var store = new MongoDBStore(
@@ -72,31 +70,31 @@ app.use(passport.session());
 //   next();
 //   });
 
-app.use(function(req, res, next){
-  // if there's a flash message, transfer
-  // it to the context, then clear it
-  res.locals.flash = req.session.flash;
-  delete req.session.flash;
-  next();
-  });
+// app.use(function(req, res, next){
+//   // if there's a flash message, transfer
+//   // it to the context, then clear it
+//   res.locals.flash = req.session.flash;
+//   delete req.session.flash;
+//   next();
+//   });
 
-
-app.use(expressValidator({
-  errorFormatter: function(param, msg, value) {
-      var namespace = param.split('.')
-      , root    = namespace.shift()
-      , formParam = root;
+app.use(expressValidator());
+// app.use(expressValidator({
+//   errorFormatter: function(param, msg, value) {
+//       var namespace = param.split('.')
+//       , root    = namespace.shift()
+//       , formParam = root;
  
-    while(namespace.length) {
-      formParam += '[' + namespace.shift() + ']';
-    }
-    return {
-      param : formParam,
-      msg   : msg,
-      value : value
-    };
-  }
-}));
+//     while(namespace.length) {
+//       formParam += '[' + namespace.shift() + ']';
+//     }
+//     return {
+//       param : formParam,
+//       msg   : msg,
+//       value : value
+//     };
+//   }
+// }));
 
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -108,12 +106,6 @@ app.use(function(req,res,next){
   next();
 });
 
-
-//make db accessible to routes
-app.use(function(req,res,next){ 
-  req.db = db;
-  next();
-});
 
 
 app.use('/', index);
