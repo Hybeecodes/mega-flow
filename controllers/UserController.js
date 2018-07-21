@@ -1,27 +1,25 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const User = require('../models/User');
 const UserInfo = require('../models/UserInfo');
 const UserHandler = require('../handlers/UserHandler');
-const uploadFile = require('../middleware/multer');
 const EnsureLoggedIn = require('../middleware/ensureLoggedIn');
 const passport = require('../config/passport');
 const sendMail = require('../middleware/mail');
+const passwoid = require('passwoid');
+const bcrypt = require('bcrypt-nodejs');
 
-module.exports.getIndex = EnsureLoggedIn,(req,res,next)=>{
+module.exports.getIndex = (req,res,next)=>{
     res.redirect('/users/dashboard');
 }
 
-module.exports.getLogin = (req,res)=>{
-    res.render('users/login',{title:'Mega Flow - Login'});
-}
 
-module.exports.getDashboard = EnsureLoggedIn,(req,res,next)=>{
+module.exports.getDashboard = (req,res,next)=>{
     res.render('users/dashboard',{title:'MegaSlack - dashboard',user:req.user,name:'dashboard'});
     next();
 }
 
-module.exports.updateProfile = EnsureLoggedIn,uploadFile.single('photo'), (req,res,next)=>{
+module.exports.updateProfile =  (req,res,next)=>{
     UserHandler.updateUserProfile(req,res).then((result)=>{
         res.redirect('/users/profile');
     }).catch((err)=>{
@@ -29,7 +27,7 @@ module.exports.updateProfile = EnsureLoggedIn,uploadFile.single('photo'), (req,r
     });
 }
 
-module.exports.getProfile = EnsureLoggedIn,(req,res,next)=>{
+module.exports.getProfile = (req,res,next)=>{
     UserHandler.getUserById(req.user._id).then(user=>{
         res.render('users/profile',{user:user,title:'MegaFlow - profile', name:'profile'});
     }).catch(err=>{
@@ -37,74 +35,47 @@ module.exports.getProfile = EnsureLoggedIn,(req,res,next)=>{
     });
 }
 
-module.exports.authenticateUser = passport.authenticate('local',{
-    failureRedirect:'/users/login',
-    failureFlash:'Invalid username or password'
-  }),(req,res,next)=>{
-    // console.log('inside')
-    req.flash('success','You are logged in');
-    var user = req.user;
-    res.redirect('/users/dashboard'); 
-}
 
-module.exports.getRegister = (req,res,next)=>{
-    res.render('users/register',{title:'Mega Flow - Register',success: req.session.success, errors: req.session.errors });
+module.exports.getChangePass = (req,res,next)=>{
+    res.render('users/change_password',{title:'Mega Flow - Change Password',name:'changePass',errors:req.session.errors});
     req.session.errors = null;
 }
 
-module.exports.registerUser = uploadFile.single('photo'),(req,res,next)=>{
-    req.checkBody('firstname','firstname is required').notEmpty();
-    req.checkBody('lastname','lastname is required').notEmpty();
-    req.checkBody('password','password is required').notEmpty();
-    // req.checkBody('password2','passwords must be the same').equals(req.body.password);
-    req.checkBody('email','email is required').notEmpty();
-    req.checkBody('email','Enter a valid email').isEmail();
-    req.checkBody('username','username is required').notEmpty();
-    req.getValidationResult().then((errors)=>{
-        if(errors){
-            req.session.errors = errors;
-            req.session.success = false;
-            res.redirect('/users/register');
-        }else{
-            if(UserHandler.checkUserByUsername(req.body.username)){
-                var errors = [
-                    {
-                      msg:'Username Already exists '
-                    }
-                  ];
-                  res.redirect('/users/register');
-            }else{
-                if(UserHandler.checkUserByEmail(req.body.email)){
-                    var errors = [
-                        {
-                          msg:'Email Already exists '
-                        }
-                      ];
-                      res.redirect('/users/register');
-                }else{
-                    UserHandler.addNewUser(req.body).then((user)=>{
-                        // send email
-                        const subject = "Confirmation Email";
-                        const text = `Your registration was successful.<br> Your username is ${req.body.username}.<br> Enjoy your time with us.`;
-                        const to = req.body.email;
-                        sendMail(subject,text,to).then((info)=>{
-                            res.redirect('/users/login');
-                        }).catch((err)=>{
-                            console.log(err);
-                        });
-                    }).catch((err)=>{
-                        var errors = [
-                            {
-                              msg:'Sorry, an error occured '
-                            }
-                          ];
-                          res.redirect('users/register');
-                    });
-                }
+module.exports.changeUserPass = (req,res)=>{
+    req.checkBody('password1','please enter your old password').notEmpty();
+  req.checkBody('password2','please enter your new password').notEmpty();
+  req.checkBody('password3','Please confirm your new password').equals(req.body.password2);
+
+  req.getValidationResult().then((errors)=>{
+
+    if(!errors.isEmpty()){
+    //   console.log(result.array())
+        req.session.errors = errors;
+        req.session.success = false;
+      req.redirect('/users/change_password');
+
+    }else{
+      var password = bcrypt.hashSync(req.body.password2);
+      UserHandler.changeUserPass(req.user._id,req.user.email,password).then((result)=>{
+        // send mail
+            const subject = "Password Change";
+            const text = `Your password was changed successfully. <br> Here is your new password: <b>${req.body.password2}</b>`;
+            const to = req.user.email;
+            sendMail(subject,text,to).then((info)=>{
+                res.redirect('/users/login');
+            }).catch((err)=>{
+                console.log(err);
+            });  
+      }).catch((err)=>{
+        var errors = [
+            {
+              msg:'Sorry, an error occcured.'
             }
-        }
-        
-    });
+          ];
+          res.redirect('/users/change_password');
+      })
+    }
+  });
 }
 
 

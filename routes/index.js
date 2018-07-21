@@ -1,49 +1,30 @@
 var express = require('express');
 var router = express.Router();
-var app = require('../app');
-const mongo = require('mongodb');
-var db = require('monk')('mongodb://mega:mega@ds147034.mlab.com:47034/mega-flow');
-var multer = require('multer');
-var users = db.get('users');
-var bcrypt = require('bcrypt-nodejs');
-const nodemailer = require('nodemailer');
-var passport = require('passport');
-// var LocalStrategy = require('passport-local').Strategy;
-const passwoid = require('passwoid');
-const jwt = require('jsonwebtoken');
-const csrf = require('csurf');
 
-var csrfProtection = csrf({ cookie: true });
+const GuestController = require('../controllers/GuestController');
+const passport = require('../config/passport');
+const uploadFile = require('../middleware/multer');
 
-var sess;
 /* GET home page. */
-router.get('/',csrfProtection, function(req, res, next) {
-    
-    if(req.user){
-        // var user = req.user;
-        // console.log(user)
-        // var user = req.user;
-        res.render('users/dashboard', { title: 'Mega Flow - ',user:req.user,csrfToken:req.csrfToken(),name:'dashboard'});
-    }else{
-        res.render('index', { title: 'Mega Flow',user:false,csrfToken:req.csrfToken()});
-    }
-    
-});
-router.get('/session',function(req,res,next){
-    res.send('Hello ' + JSON.stringify(req.session));
+router.get('/', (req,res)=>{
+    res.render('index',{title:'Mega-Flow'});
 });
 
-function ensureAuthenticated(req,res,next){
-    if(req.isAuthenticated()){
-        console.log(req.session);
-        console.log('right to login');
-        return next();
-    }
-    console.log('unauthorized user');
-    res.redirect('/users/login');
-}
+router.post('/login',passport.authenticate('local',{
+    failureRedirect:'/users/login',
+    failureFlash:'Invalid username or password'
+  }),GuestController.authenticateUser);
+
+router.get('/login',GuestController.getLogin); 
 
 
+router.get('/register',GuestController.getRegister);
 
+router.post('/register',uploadFile.single('photo'),GuestController.registerUser);
+
+//forgot password
+router.get('/reset_password',GuestController.getResetPass)
+
+router.post('/reset_password',GuestController.resetUserPass);
 
 module.exports = router;

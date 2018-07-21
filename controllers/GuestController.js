@@ -1,0 +1,125 @@
+const express = require('express');
+const router = express.Router();
+const User = require('../models/User');
+const UserInfo = require('../models/UserInfo');
+const UserHandler = require('../handlers/UserHandler');
+const EnsureLoggedIn = require('../middleware/ensureLoggedIn');
+const passport = require('../config/passport');
+const sendMail = require('../middleware/mail');
+const passwoid = require('passwoid');
+const bcrypt = require('bcrypt-nodejs');
+
+
+module.exports.getLogin = (req,res)=>{
+    res.render('login',{title:'Mega Flow - Login'});
+}
+
+module.exports.authenticateUser = (req,res,next)=>{
+    // console.log('inside')
+    req.flash('success','You are logged in');
+    var user = req.user;
+    res.redirect('/users/dashboard'); 
+}
+
+module.exports.getRegister = (req,res,next)=>{
+    res.render('register',{title:'Mega Flow - Register',success: req.session.success, errors: req.session.errors });
+    req.session.errors = null;
+}
+
+module.exports.registerUser = (req,res,next)=>{
+    req.checkBody('firstname','firstname is required').notEmpty();
+    req.checkBody('lastname','lastname is required').notEmpty();
+    req.checkBody('password','password is required').notEmpty();
+    // req.checkBody('password2','passwords must be the same').equals(req.body.password);
+    req.checkBody('email','email is required').notEmpty();
+    req.checkBody('email','Enter a valid email').isEmail();
+    req.checkBody('username','username is required').notEmpty();
+    req.getValidationResult().then((errors)=>{
+        if(errors){
+            req.session.errors = errors;
+            req.session.success = false;
+            res.redirect('/users/register');
+        }else{
+            if(UserHandler.checkUserByUsername(req.body.username)){
+                var errors = [
+                    {
+                      msg:'Username Already exists '
+                    }
+                  ];
+                  res.redirect('/users/register');
+            }else{
+                if(UserHandler.checkUserByEmail(req.body.email)){
+                    var errors = [
+                        {
+                          msg:'Email Already exists '
+                        }
+                      ];
+                      res.redirect('/users/register');
+                }else{
+                    UserHandler.addNewUser(req.body).then((user)=>{
+                        // send email
+                        const subject = "Confirmation Email";
+                        const text = `Your registration was successful.<br> Your username is ${req.body.username}.<br> Enjoy your time with us.`;
+                        const to = req.body.email;
+                        sendMail(subject,text,to).then((info)=>{
+                            res.redirect('/users/login');
+                        }).catch((err)=>{
+                            console.log(err);
+                        });
+                    }).catch((err)=>{
+                        var errors = [
+                            {
+                              msg:'Sorry, an error occured '
+                            }
+                          ];
+                          res.redirect('users/register');
+                    });
+                }
+            }
+        }
+        
+    });
+}
+
+module.exports.getResetPass = (req,res,next)=>{
+    res.render('users/reset_password',{title:'Mega Flow - Reset Password',errors:req.session.errors,success:req.session.success});
+    req.session.errors = null;
+}
+
+module.exports.resetUserPass = (req,res,next)=>{
+    // verify email
+  req.checkBody('email','email is required').notEmpty();
+  req.checkBody('email','Enter a valid email').isEmail();
+  // get errors
+  req.getValidationResult().then((errors)=>{
+      if(!errors.isEmpty()){
+          req.session.errors = errors;
+          req.session.success = false;
+      }else{
+          const email = req.body.email;
+          // generate new password
+          const newPass= passwoid(8);
+          const newPassHash =bcrypt.hashSync(newPass);
+          // update password
+          UserHandler.changeUserPass(req.user._id,email,newPassHash).then((result)=>{
+              // send email
+              const subject = "Password Reset";
+              const text = `Your password was reset successfully. <br> Here is your new password: <b>${newPass}</b>`;
+              const to = req.body.email;
+              sendMail(subject,text,to).then((info)=>{
+                  res.redirect('/users/login');
+              }).catch((err)=>{
+                  console.log(err);
+              });  
+          }).catch((err)=>{
+            var errors = [
+                {
+                  msg:'Sorry, an error occcured.'
+                }
+              ];
+              res.redirect('/users/reset_password');
+          });
+        
+      }
+  });
+}
