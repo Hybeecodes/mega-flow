@@ -11,16 +11,15 @@ router.get('/', (req,res)=>{
 });
 
 router.post('/login',passport.authenticate('local',{
-    failureRedirect:'/users/login',
+    failureRedirect:'/login',
     failureFlash:'Invalid username or password'
   }),GuestController.authenticateUser);
 
 router.get('/login',GuestController.getLogin); 
 
-
 router.get('/register',GuestController.getRegister);
 
-router.post('/register',uploadFile.single('photo'),GuestController.registerUser);
+router.post('/register',uploadFile.single('photo'),GuestController.register);
 
 //forgot password
 router.get('/reset_password',GuestController.getResetPass)

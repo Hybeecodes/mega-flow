@@ -3,7 +3,6 @@ const router = express.Router();
 const User = require('../models/User');
 const UserInfo = require('../models/UserInfo');
 const UserHandler = require('../handlers/UserHandler');
-const EnsureLoggedIn = require('../middleware/ensureLoggedIn');
 const passport = require('../config/passport');
 const sendMail = require('../middleware/mail');
 const passwoid = require('passwoid');
@@ -17,16 +16,50 @@ module.exports.getLogin = (req,res)=>{
 module.exports.authenticateUser = (req,res,next)=>{
     // console.log('inside')
     req.flash('success','You are logged in');
-    var user = req.user;
     res.redirect('/users/dashboard'); 
 }
 
 module.exports.getRegister = (req,res,next)=>{
+    console.log(req.session.errors);
     res.render('register',{title:'Mega Flow - Register',success: req.session.success, errors: req.session.errors });
     req.session.errors = null;
 }
 
+module.exports.register = (req,res)=>{
+    // backend validation
+    const firstname = req.body.firstname;
+    const lastname = req.body.lastname;
+    const password = req.body.password;
+    const password2 = req.body.password2;
+    const email = req.body.email;
+    const username = req.body.username;
+    if(!UserHandler.validateData(firstname,lastname,password,password2,email,username)){
+        res.json({status:0,message:"Please fill all fields!"});
+        return;
+    }
+
+    if(UserHandler.checkUserByEmail(email)){
+        res.json({status:0,message:"Email exists Already"});
+        return;
+    }    // check if username exists
+    else if (UserHandler.checkUserByUsername(username)){
+        res.json({status:0,message:"Username exists Already"});
+        return;
+    }else{
+        const newUser = {
+
+        };
+        UserHandler.addNewUser(req.body).then((user)=>{
+            res.json({status:1,message:"Registration Successful"})
+        }).catch((err)=>{
+            res.json({status:0,message:"Sorry,An erorr occured"+err});
+        })
+    }
+}
+
 module.exports.registerUser = (req,res,next)=>{
+    console.log(req)
+    res.send("something");
     req.checkBody('firstname','firstname is required').notEmpty();
     req.checkBody('lastname','lastname is required').notEmpty();
     req.checkBody('password','password is required').notEmpty();
@@ -38,7 +71,7 @@ module.exports.registerUser = (req,res,next)=>{
         if(errors){
             req.session.errors = errors;
             req.session.success = false;
-            res.redirect('/users/register');
+            res.redirect('/register');
         }else{
             if(UserHandler.checkUserByUsername(req.body.username)){
                 var errors = [
@@ -46,7 +79,7 @@ module.exports.registerUser = (req,res,next)=>{
                       msg:'Username Already exists '
                     }
                   ];
-                  res.redirect('/users/register');
+                  res.redirect('/register');
             }else{
                 if(UserHandler.checkUserByEmail(req.body.email)){
                     var errors = [
@@ -54,7 +87,7 @@ module.exports.registerUser = (req,res,next)=>{
                           msg:'Email Already exists '
                         }
                       ];
-                      res.redirect('/users/register');
+                      res.redirect('/register');
                 }else{
                     UserHandler.addNewUser(req.body).then((user)=>{
                         // send email
@@ -62,7 +95,7 @@ module.exports.registerUser = (req,res,next)=>{
                         const text = `Your registration was successful.<br> Your username is ${req.body.username}.<br> Enjoy your time with us.`;
                         const to = req.body.email;
                         sendMail(subject,text,to).then((info)=>{
-                            res.redirect('/users/login');
+                            res.redirect('/login');
                         }).catch((err)=>{
                             console.log(err);
                         });
@@ -72,7 +105,7 @@ module.exports.registerUser = (req,res,next)=>{
                               msg:'Sorry, an error occured '
                             }
                           ];
-                          res.redirect('users/register');
+                          res.redirect('/register');
                     });
                 }
             }

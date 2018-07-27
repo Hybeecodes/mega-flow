@@ -12,25 +12,14 @@
 <body>
         <%- include('./partials/not_user_header') %>
         <div class="container">
-                <form class="well" method="post" action="/users/register" enctype="multipart/form-data" role="form">
+                <form class="well" method="post" id="registerForm" action="/register" enctype="multipart/form-data" role="form">
 
                     <h4 class="text-center">Please Register to get Started</h4>
-
                     <center>
-                      
-                  <% if(errors){ %>
-                      <% errors.forEach(function(error){ %>
-                          <div class="alert alert-danger" >
-                             <%= error.msg %>
-                          </div>
-                      <% }) %>
-                  <% } %>
-                  <% if(success){ %>
-                    <div class="alert alert-success" >
-                      You have been successfully registered
-                   </div>
-                  <% } %>
-                  </center>
+                      <div class="alert" style="display:none;">
+
+                      </div>
+                    </center>
                     <div class="form-group">
                             <label for="firstname">Firstname:</label>
                             <input type="text" class="form-control" id="firstname" placeholder="Firstname" name="firstname">
@@ -61,7 +50,7 @@
                           <input type="file" class="form-control" id="photo" name="photo">
                         </div>
                         <div class="text-center">
-                            <button type="submit" class="btn btn-primary ">Submit</button>
+                            <button type="submit" id="submit" class="btn btn-primary ">Submit</button>
                         </div>
                         
                       </form> 
@@ -70,6 +59,41 @@
          <%- include('./partials/footer') %>
      <script src="/javascripts/jquery-3.2.1.js"></script>
      <script src="/javascripts/bootstrap.js"></script>
+
+     <script>
+       $('#registerForm').submit((e)=>{
+         e.preventDefault();
+         var file = $("#photo")[0].files[0];
+         var data = {
+           "firstname": $('#firstname').val(),
+           "lastname": $('#lastname').val(),
+           "username": $('#username').val(),
+           "email": $('#email').val(),
+           "password": $('#password').val(),
+           "password2": $('#password2').val(),
+         };
+         $('#submit').text('Please wait...').attr('disabled',true);
+         $.ajax({
+           type:'POST',
+           url: '/register',
+           data: data,
+           success:function(data){
+             if(data['status'] == 0){
+               $('.alert').text(data['message']).removeClass('alert-success').addClass('alert-danger').css('display','inline');
+               $('#submit').text('Submit').attr('disabled',false);
+             }else{
+              $('.alert').text(data['message']).removeClass('alert-danger').addClass('alert-success').css('display','inline');
+              setTimeout(()=>{
+                window.location ='/login';
+              },3000)
+             }
+           },
+           error: function(xhr){
+             console.log(xhr);
+           }
+         })
+       })
+     </script>
      
 </body>
 </html>

@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const UserInfo = require('../models/UserInfo');
+const bcrypt = require('bcrypt-nodejs')
 
 module.exports.getAllUsers = ()=>{
     User.find({},{},(err,users)=>{
@@ -46,11 +47,7 @@ module.exports.updateUserProfile = (req,res)=>{
         }
     
         //check if user info exist
-        User.findOne({email:req.user.email},(err,user)=>{
-          if(err) throw err;
-          if(user){
-            // user info exists then update
-            User.update({email: email},
+            User.findOneAndUpdate({_id: req.user._id},
                {$set:{
                  blogname:blogname,
                  username:username,
@@ -74,36 +71,8 @@ module.exports.updateUserProfile = (req,res)=>{
                     resolve(result);
                   }
             });
-          }else{
-            // user info doesn't exist, so create one
-            User.create(
-              {
-                blogname:blogname,
-                username:username,
-                email:email,
-                firstname:firstname,
-                lastname:lastname,
-                address:address,
-                city:city,
-                country:country,
-                postal_code:zipcode,
-                facebook:facebook,
-                twitter:twitter,
-                instagram:instagram,
-                about:about,
-                photo:photo
-               },(err,result)=>{
-                 if(err){
-                   reject(err);
-                 }else{
-                   console.log(req.user.username+"'s profile was updated successfully");
-                   resolve(result);
-                 }
-           });
-    
-          }
-        })
-    })      
+          
+        })      
 }
 
 module.exports.checkUserInfoByEmail = (email)=>{
@@ -138,6 +107,20 @@ module.exports.addNewUser = (userData)=>{
         })
     })
     
+}
+
+module.exports.validateData = (...args)=>{
+    const dataArr = args;
+    var check = true;
+    for (let i = 0; i < dataArr.length; i++) {
+       var data = dataArr[i];
+    //    console.log(data)
+        if(data === '' || data === undefined){
+            check = false;
+            break;
+        }
+    }
+    return check;
 }
 
 module.exports.checkUserByUsername= (username)=>{
