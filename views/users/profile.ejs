@@ -30,7 +30,7 @@
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
     <link href="/stylesheets/pe-icon-7-stroke.css" rel="stylesheet" />
 </head>
-<body >
+<body>
 
     <%- include('../partials/user-side-nav') %>
 
@@ -46,13 +46,18 @@
                             <div class="header">
                                 <h4 class="title">Edit Profile</h4>
                             </div>
+                            <center>
+                                <div class="alert" style="display:none;">
+          
+                                </div>
+                              </center>
                             <div class="content">
-                                <form class="my-form" action="/users/profile" method="post" enctype="multipart/form-data" role="form">
+                                <form class="my-form" id="profileForm" action="/users/profile" method="post" enctype="multipart/form-data" role="form">
                                     <div class="row">
                                         <div class="col-md-5">
                                             <div class="form-group">
                                                 <label>Your blog Page Name</label>
-                                                <input type="text" class="form-control" placeholder="blog page name"
+                                                <input type="text" id="blogname" class="form-control" placeholder="blog page name"
                                         
                                                  <% if(user.blogname){ %>
                                                     value="<%=user.blogname %>"
@@ -66,13 +71,13 @@
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label>Username</label>
-                                                <input type="text" class="form-control" placeholder="Username" value="<%= user.username %>" name="username">
+                                                <input type="text" id="username" class="form-control" placeholder="Username" value="<%= user.username %>" name="username">
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label for="exampleInputEmail1">Email address</label>
-                                                <input type="email" class="form-control" placeholder="Email" value="<%= user.email %>" name="email" >
+                                                <input type="email" class="form-control" id="email" placeholder="Email" value="<%= user.email %>" name="email" >
                                             </div>
                                         </div>
                                     </div>
@@ -81,13 +86,13 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>First Name</label>
-                                                <input type="text" class="form-control" placeholder="Firstname" value="<%= user.firstname %>" name="firstname" >
+                                                <input type="text" class="form-control" id="firstname" placeholder="Firstname" value="<%= user.firstname %>" name="firstname" >
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Last Name</label>
-                                                <input type="text" class="form-control" placeholder="Last Name" value="<%= user.lastname %>" name="lastname" >
+                                                <input type="text" class="form-control" id="lastname" placeholder="Last Name" value="<%= user.lastname %>" name="lastname" >
                                             </div>
                                         </div>
                                     </div>
@@ -96,7 +101,7 @@
                                         <div class="col-md-12">
                                             <div class="form-group">
                                                 <label>Address</label>
-                                                <input type="text" class="form-control" placeholder="Home Address"
+                                                <input type="text" class="form-control" id="address" placeholder="Home Address"
                                                  
                                                  <% if(user.address){ %>
                                                     value="<%=user.address %>"
@@ -112,7 +117,7 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>City</label>
-                                                <input type="text" class="form-control" placeholder="City"
+                                                <input type="text" class="form-control" id="city" placeholder="City"
                                                 <% if(user.city){ %>
                                                     value="<%=user.city %>"
                                                 <% }else{ %>
@@ -125,7 +130,7 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Country</label>
-                                                <input type="text" class="form-control" placeholder="Country"
+                                                <input type="text" class="form-control" id="country" placeholder="Country"
                                                 <% if(user.country){ %>
                                                     value="<%=user.country %>"
                                                 <% }else{ %>
@@ -137,7 +142,7 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Postal Code</label>
-                                                <input type="number" class="form-control" placeholder="ZIP Code"
+                                                <input type="number" class="form-control" id="zip_code" placeholder="ZIP Code"
                                                 <% if(user.zipcode){ %>
                                                     value="<%=user.zipcode %>"
                                                 <% }else{ %>
@@ -152,7 +157,7 @@
                                             <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label>facebook </label>
-                                                    <input type="text" class="form-control" placeholder="facebook"
+                                                    <input type="text" class="form-control" id="facebook" placeholder="facebook"
                                                     <% if(user.facebook){ %>
                                                         value="<%=user.facebook %>"
                                                     <% }else{ %>
@@ -164,7 +169,7 @@
                                             <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label>Twitter</label>
-                                                    <input type="text" class="form-control" placeholder="twitter"
+                                                    <input type="text" class="form-control" id="twitter" placeholder="twitter"
                                                     <% if(user.twitter){ %>
                                                         value="<%=user.twitter %>"
                                                     <% }else{ %>
@@ -176,7 +181,7 @@
                                             <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label>Instagram</label>
-                                                    <input type="text" class="form-control" placeholder="Instagram"
+                                                    <input type="text" class="form-control" id="instagram" placeholder="Instagram"
                                                     <% if(user.instagram){ %>
                                                         value="<%=user.instagram %>"
                                                     <% }else{ %>
@@ -190,7 +195,7 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Change Profile picture</label>
-                                                <input type="file" class="form-control" placeholder="Change Picture" accept="image/*" name="photo">
+                                                <input type="file" class="form-control" id="photo" placeholder="Change Picture" accept="image/*" name="photo">
                                             </div>
                                         </div>
                                     </div>
@@ -199,13 +204,13 @@
                                         <div class="col-md-12">
                                             <div class="form-group">
                                                 <label>About You</label>
-                                                <textarea rows="5" class="form-control" placeholder="Here can be your description"
+                                                <textarea rows="5" class="form-control" id="about" placeholder="Here can be your description"
                                                  name="about"><% if(user.about){ %><%=user.about %><%}%></textarea>
                                             </div>
                                         </div>
                                     </div>
                                     
-                                    <button type="submit" class="btn btn-info btn-fill pull-right">Update Profile</button>
+                                    <button type="submit" id="update" class="btn btn-info btn-fill pull-right">Update Profile</button>
                                     <div class="clearfix"></div>
 
                                 </form>
@@ -220,8 +225,10 @@
                             <div class="content">
                                 <div class="author">
                                      <a href="#">
-                                        <% var img = user.photo.path.substring(6); %>
-                                        
+                                         <% if(user.photo){
+                                            var img = user.photo.path.substring(6);
+                                         } %>
+                                                           
                                     <img class="avatar border-gray"
                                     <% if(user.photo){ %>
                                         src="<%= img %>"
@@ -286,6 +293,48 @@
 
 <!-- Light Bootstrap Table DEMO methods, don't include it in your project! -->
 <script src="/javascripts/demo.js"></script>
+
+<script>
+    $('#profileForm').submit((e)=>{
+      e.preventDefault();
+      var data = {
+        "firstname": $('#firstname').val(),
+        "lastname": $('#lastname').val(),
+        "username": $('#username').val(),
+        "email": $('#email').val(),
+        "blogname": $('#blogname').val(),
+        "address": $('#address').val(),
+        "city": $('#city').val(),
+        "country": $('#country').val(),
+        "zipcode": $('#zip_code').val(),
+        "about": $('#about').val(),
+        "facebook": $('#facebook').val(),
+        "twitter": $('#twitter').val(),
+        "instagram": $('#instagram').val()
+      };
+     var fd = new FormData(this);
+      $('#update').text('Please wait...').attr('disabled',true);
+      $.ajax({
+        type:'POST',
+        url: '/users/profile',
+        data: data,
+        success:function(data){
+          if(data['status'] == 0){
+            $('.alert').text(data['message']).removeClass('alert-success').addClass('alert-danger').css('display','inline');
+            $('#update').text('Update Profile').attr('disabled',false);
+          }else{
+           $('.alert').text(data['message']).removeClass('alert-danger').addClass('alert-success').css('display','inline');
+           setTimeout(()=>{
+             location.reload(true);
+           },3000)
+          }
+        },
+        error: function(xhr){
+          console.log(xhr);
+        }
+      })
+    })
+  </script>
 
 </html>
 

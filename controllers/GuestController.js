@@ -14,9 +14,22 @@ module.exports.getLogin = (req,res)=>{
 }
 
 module.exports.authenticateUser = (req,res,next)=>{
-    // console.log('inside')
-    req.flash('success','You are logged in');
-    res.redirect('/users/dashboard'); 
+   
+    const username = req.body.username;
+    const password = req.body.password;
+    if(!UserHandler.validateData(password,username)){
+        res.json({status:0,message:"Please fill all fields!"});
+        return;
+    }
+        UserHandler.getUserByLogin(username,password).then((user)=>{
+            req.session.user = user;
+            res.json({status:1,message:"Login Successful, we are redirecting you..."});
+            return;
+        }).catch((err)=>{
+            res.json({status:0,message:"Invalid Login Details"});
+            return;
+        });
+
 }
 
 module.exports.getRegister = (req,res,next)=>{
@@ -50,9 +63,9 @@ module.exports.register = (req,res)=>{
 
         };
         UserHandler.addNewUser(req.body).then((user)=>{
-            res.json({status:1,message:"Registration Successful"})
+            res.json({status:1,message:"Registration Successful"});
         }).catch((err)=>{
-            res.json({status:0,message:"Sorry,An erorr occured"+err});
+            res.json({status:0,message:"Sorry,An erorr occured"});
         })
     }
 }

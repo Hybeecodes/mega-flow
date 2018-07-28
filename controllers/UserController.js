@@ -15,20 +15,19 @@ module.exports.getIndex = (req,res,next)=>{
 
 
 module.exports.getDashboard = (req,res,next)=>{
-    res.render('users/dashboard',{title:'MegaSlack - dashboard',user:req.user,name:'dashboard'});
-    next();
+    res.render('users/dashboard',{title:'MegaSlack - dashboard',user:req.session.user,name:'dashboard'});
 }
 
 module.exports.updateProfile =  (req,res,next)=>{
     UserHandler.updateUserProfile(req,res).then((result)=>{
-        res.redirect('/users/profile');
+        res.json({status:1,message:"Profile Updated Successfully!"});
     }).catch((err)=>{
-        res.redirect('/users/profile');
+        res.json({status:0,message:"Sorry, Unable to Update Status!"+err});
     });
 }
 
 module.exports.getProfile = (req,res,next)=>{
-    UserHandler.getUserById(req.user._id).then(user=>{
+    UserHandler.getUserById(req.session.user._id).then(user=>{
         res.render('users/profile',{user:user,title:'MegaFlow - profile', name:'profile'});
     }).catch(err=>{
         res.redirect('/users/dashboard');
@@ -56,11 +55,11 @@ module.exports.changeUserPass = (req,res)=>{
 
     }else{
       var password = bcrypt.hashSync(req.body.password2);
-      UserHandler.changeUserPass(req.user._id,req.user.email,password).then((result)=>{
+      UserHandler.changeUserPass(req.session.user._id,req.session.user.email,password).then((result)=>{
         // send mail
             const subject = "Password Change";
             const text = `Your password was changed successfully. <br> Here is your new password: <b>${req.body.password2}</b>`;
-            const to = req.user.email;
+            const to = req.session.user.email;
             sendMail(subject,text,to).then((info)=>{
                 res.redirect('/users/login');
             }).catch((err)=>{
@@ -80,8 +79,8 @@ module.exports.changeUserPass = (req,res)=>{
 
 
 module.exports.logout = (req,res)=>{
-    req.logout();
-  res.redirect('/users/login');
+    req.session.user = null;
+  res.redirect('/login');
 }
 
 

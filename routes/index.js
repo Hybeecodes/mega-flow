@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var formidable = require('formidable');
 
 const GuestController = require('../controllers/GuestController');
 const passport = require('../config/passport');
@@ -10,16 +11,13 @@ router.get('/', (req,res)=>{
     res.render('index',{title:'Mega-Flow'});
 });
 
-router.post('/login',passport.authenticate('local',{
-    failureRedirect:'/login',
-    failureFlash:'Invalid username or password'
-  }),GuestController.authenticateUser);
+router.post('/login',GuestController.authenticateUser);
 
 router.get('/login',GuestController.getLogin); 
 
 router.get('/register',GuestController.getRegister);
 
-router.post('/register',uploadFile.single('photo'),GuestController.register);
+router.post('/register',GuestController.register);
 
 //forgot password
 router.get('/reset_password',GuestController.getResetPass)

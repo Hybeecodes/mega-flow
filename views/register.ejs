@@ -63,15 +63,15 @@
      <script>
        $('#registerForm').submit((e)=>{
          e.preventDefault();
-         var file = $("#photo")[0].files[0];
          var data = {
            "firstname": $('#firstname').val(),
            "lastname": $('#lastname').val(),
            "username": $('#username').val(),
            "email": $('#email').val(),
            "password": $('#password').val(),
-           "password2": $('#password2').val(),
+           "password2": $('#password2').val()
          };
+        var fd = new FormData(this);
          $('#submit').text('Please wait...').attr('disabled',true);
          $.ajax({
            type:'POST',

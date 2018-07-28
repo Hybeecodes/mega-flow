@@ -24,6 +24,25 @@ module.exports.getUserById = (userId)=>{
     })    
 }
 
+module.exports.getUserByLogin = (username,password)=>{
+    return new Promise((resolve,reject)=>{
+        User.findOne({username:username},(err,user)=>{
+            if(err){
+                reject(err);
+            }else{
+                bcrypt.compare(password,user.password,(err,isMatch)=>{
+                    if(isMatch){
+                        resolve(user);
+                    }else{
+                        reject(err);
+                    }
+                })
+                
+            }
+    })
+})    
+}
+
 module.exports.updateUserProfile = (req,res)=>{
     return new Promise((resolve,reject)=>{
         var blogname = req.body.blogname;
@@ -39,15 +58,15 @@ module.exports.updateUserProfile = (req,res)=>{
         var twitter = req.body.twitter;
         var instagram = req.body.instagram;
         var about = req.body.about;
-        if(req.file){
-          var photo = req.file;
+        // if(req.file){
+        //   var photo = req.file;
           
-        }else{
-          var photo = req.user.photo;
-        }
+        // }else{
+        //   var photo = req.user.photo;
+        // }
     
         //check if user info exist
-            User.findOneAndUpdate({_id: req.user._id},
+            User.findOneAndUpdate({_id: req.session.user._id},
                {$set:{
                  blogname:blogname,
                  username:username,
@@ -61,13 +80,12 @@ module.exports.updateUserProfile = (req,res)=>{
                  facebook:facebook,
                  twitter:twitter,
                  instagram:instagram,
-                 about:about,
-                 photo:photo
+                 about:about
                 }},(err,result)=>{
                   if(err){
                     reject(err);
                   }else{
-                    console.log(req.user.username+"'s profile was updated successfully");
+                    // console.log(req.user.username+"'s profile was updated successfully");
                     resolve(result);
                   }
             });
@@ -93,12 +111,18 @@ module.exports.addNewUser = (userData)=>{
     return new Promise((resolve,reject)=>{
         var firstname = userData.firstname;
         var lastname = userData.lastname;
-        var password =bcrypt.hashSync(userData.password);
+        var password = bcrypt.hashSync(userData.password);
         var email = userData.email;
         var username = userData.username;
-        var photo = userData.photo;
+        newUser = {
+            firstname: firstname,
+            lastname: lastname,
+            password: password,
+            email: email,
+            username: username
+        };
 
-        User.create(userData,(err,user)=>{
+        User.create(newUser,(err,user)=>{
             if(err){
                 reject(err);
             }else{
@@ -124,14 +148,14 @@ module.exports.validateData = (...args)=>{
 }
 
 module.exports.checkUserByUsername= (username)=>{
+    console.log(username)
     User.findOne({username:username},(err,user)=>{
         if(err){
             return false;
+        }else if(user){
+            return true;           
         }else{
-            if(user)
-                return true;
-            else
-                return false;
+            return false;
         }
     })
 }

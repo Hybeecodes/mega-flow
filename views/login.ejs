@@ -13,19 +13,13 @@
 <body>
         <%- include('./partials/not_user_header') %>
         <div class="container">
-                <form accept-charset="UTF-8" class="well" method="post" action="/login" role="form">
+                <form accept-charset="UTF-8" id="loginForm" class="well"  method="post" action="/login" role="form">
                     <h3>Please Login</h3>
                     <center>
-                       <% var messages = getMessages() %>
-                    <% if(messages.failure){ %>
-                        <% messages.failure.forEach(function(error){ %>
-                            <div class="alert alert-danger" > <b>
-                               <%= error.msg %>
-                            </b>
+                            <div class="alert" style="display:none;">
+      
                             </div>
-                        <% }) %>
-                    <% } %>
-                    </center>
+                          </center>
                         <div class="form-group">
                           <label for="username">Username:</label>
                           <input type="username" class="form-control" id="username" placeholder="Enter your Username" name="username">
@@ -38,7 +32,7 @@
                         <div class="checkbox">
                           <label><input type="checkbox"> Remember me</label>
                         </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="submit" id="submit" class="btn btn-primary">Submit</button>
                         <center>
                             <p style="color:blue"><a href="/users/reset_password"> Forgot Password?</a></p>
                             <p style="color:blue"> <a href="/users/register">Don't have an account? Sign up</a> </p>
@@ -51,6 +45,36 @@
          <%- include('./partials/footer') %>
          <!-- <script src="/javascripts/jquery-3.3.1.min.js"></script> -->
      <!-- <script src="/javascripts/bootstrap.js"></script> -->
-     
+     <script>
+            $('#loginForm').submit((e)=>{
+              e.preventDefault();
+            //   var file = $("#photo")[0].files[0];
+              var data = {
+                "username": $('#username').val(),
+                "password": $('#password').val(),
+              };
+              $('#submit').text('Please wait...').attr('disabled',true);
+              $.ajax({
+                type:'POST',
+                url: '/login',
+                data: data,
+                success:function(data){
+                    console.log(data);
+                  if(data['status'] == 0){
+                    $('.alert').text(data['message']).removeClass('alert-success').addClass('alert-danger').css('display','inline');
+                    $('#submit').text('Submit').attr('disabled',false);
+                  }else{
+                   $('.alert').text(data['message']).removeClass('alert-danger').addClass('alert-success').css('display','inline');
+                   setTimeout(()=>{
+                     window.location ='/users/dashboard';
+                   },3000)
+                  }
+                },
+                error: function(xhr){
+                  console.log(xhr);
+                }
+              })
+            })
+          </script>
 </body>
 </html>

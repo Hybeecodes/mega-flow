@@ -34,7 +34,7 @@ const UserSchema = new Schema({
         type: String,
         required:false
     },
-    postal_code: {
+    zipcode: {
         type: String,
         required:false
     },

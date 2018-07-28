@@ -14,7 +14,7 @@ router.get('/',UserController.getIndex);
 router.get('/dashboard',UserController.getDashboard);
 
 
-router.post('/profile',UserController.updateProfile);
+router.post('/profile',uploadFile.single('photo'),UserController.updateProfile);
 
 router.get('/profile',UserController.getProfile);
 
@@ -23,6 +23,6 @@ router.get('/logout',UserController.logout);
 //change password
 router.get('/change_password',UserController.getChangePass);
 
-router.post('/change_password',uploadFile.single('photo'),UserController.changeUserPass)
+router.post('/change_password',UserController.changeUserPass)
 
 module.exports = router;
