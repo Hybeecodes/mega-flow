@@ -23,6 +23,14 @@ router.get('/logout',UserController.logout);
 //change password
 router.get('/change_password',UserController.getChangePass);
 
-router.post('/change_password',UserController.changeUserPass)
+router.post('/change_password',UserController.changeUserPass);
+
+router.get('/posts',UserController.getUsersPosts);
+
+router.get('/add_post',UserController.getAddPost);
+
+router.post('/add_post',UserController.postAddPost);
+
+router.get('/post/:postId',UserController.getUserPost);
 
 module.exports = router;

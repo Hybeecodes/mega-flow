@@ -9,6 +9,27 @@ const passwoid = require('passwoid');
 const bcrypt = require('bcrypt-nodejs');
 
 
+module.exports.getIndex = (req,res)=>{
+    UserHandler.getAllPosts().then((posts)=>{
+        res.render('index',{title:'Mega-Flow',posts:posts});
+    }).catch((err)=>{
+        res.send('Sorry, An Error Occured');
+    })
+}
+
+module.exports.getUserPost = (req,res)=>{
+    if(req.params.postId){   
+    const postId = req.params.postId;
+    UserHandler.getPostById(postId).then((post)=>{
+        res.render('users/post',{title:`View Post - ${post.title} `,post:post,user:req.session.user,name:'Post'});
+    }).catch((err)=>{
+        res.redirect('/');
+    })
+    }else{
+        res.redirect('/');
+    }
+}
+
 module.exports.getLogin = (req,res)=>{
     res.render('login',{title:'Mega Flow - Login'});
 }
@@ -168,4 +189,29 @@ module.exports.resetUserPass = (req,res,next)=>{
         
       }
   });
+}
+
+module.exports.postComment = (req,res)=>{
+    const commenter_name = req.body.commenter_name;
+    const comment = req.body.comment;
+    const postId = req.body.post;
+    if(!UserHandler.validateData(commenter_name,comment,postId)){
+        res.json({status:0,message:"Please fill all fields!"});
+    }else{
+        UserHandler.addComment(req.body).then((comment)=>{
+            UserHandler.getPostById(postId).then((post)=>{
+                post.comments.push(comment._id);
+                post.save((err,post)=>{
+                    if(err)
+                        res.json({status:0,message:"Sorry, Unable to add comment!"+err});
+                    else
+                    res.json({status:1,message:comment});
+                })
+            }).catch((err)=>{
+                res.json({status:0,message:"Sorry, Unable to add comment!"+err});
+            })
+        }).catch((err)=>{
+            res.json({status:0,message:"Sorry, Unable to add comment!"+err});
+        })
+    }
 }

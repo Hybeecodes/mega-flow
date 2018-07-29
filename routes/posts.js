@@ -5,7 +5,7 @@ var db = require('monk')('mongodb://mega:mega@ds147034.mlab.com:47034/mega-flow'
 // var db = require('monk')('localhost/megaflow');
 var posts = db.get('posts');
 var categories = db.get('categories');
-var Paginate = require('mongo-paginate');
+// var Paginate = require('mongoose-paginate');
 var multer = require('multer');
 
 
@@ -30,8 +30,6 @@ router.get('/', function(req, res, next) {
   }else{
     res.send('Pls login to view all posts');
   }
-    
-    
   });
   
 
@@ -55,8 +53,6 @@ router.get('/get_post/:id',function(req,res,next){
     }else{
       res.send('you can only add post as a user');
     }
-    
-    
   });
   
   router.post('/add_post',upload.single('post_img'),function(req,res,next){

@@ -6,53 +6,33 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>    
+        <%- include('../partials/header') %>
       <div class="container">
             <%- include('../partials/user-side-nav') %>
-      
-    
-    <!-- Page Content -->
-        <div class="container" style="height:70%;">
-            <%- include('../partials/header') %>
+                       
             
-            
-            <form accept-charset="UTF-8" method="POST" action="/posts/add_post" enctype="multipart/form-data" role="form">
+            <form accept-charset="UTF-8" id="addPostForm" method="POST" action="/posts/add_post" enctype="multipart/form-data" role="form">
                 
                 <div class="row-md-12">
                         <center>
                              <h3>Add New Post </h3>
-                            
-                        <% if(errors){ %>
-                            <% errors.forEach(function(error){ %>
-                                <div class="alert alert-danger" style="width:50%;">
-                                   <%= error.msg %>
-                                </div>
-                            <% }) %>
-                        <% } %>
+                            <div class="alert" style="display:none;">
+      
+                            </div>
                         </center>
 
                 <div class="col-md-6 col-md-offset-3">
                         <div class="form-group label-floating">
                             <label class="control-label" for="title">Post Title</label>
-                            <input type="text" name="title" class="form-control" id="title" >
+                            <input type="text" name="title" id="title" class="form-control" id="title" >
 
                         </div>
-                    </div>
-                    
-                    <div class="col-md-6 col-md-offset-3">
-                            <label for="category">Select Category</label>
-                            <select class="form-control" id="category" name="category">
-                                <option value="">--Select -- category--</option>
-                                <% categories.forEach(function(category){ %>
-                                    <option value="<%= category._id %>"> <%= category.cat_name %> </option>
-                                <% }) %>
-                              
-                            </select>
                     </div>
                     
                         <div class="col-md-6 col-md-offset-3">
                             <div class="form-group label-floating">
                                 <label class="control-label">Post Details</label>
-                                <textarea style="resize:none;" name="body" class="form-control" rows="7"></textarea>
+                                <textarea style="resize:none;" name="body" id="body" class="form-control" rows="7"></textarea>
     
                             </div>
                         </div>
@@ -65,13 +45,13 @@
                         </div>
 
                 <div class="col-md-12 text-center">
-                <button type="submit" name="submit" class="btn btn-primary">Add Post</button>
+                <button type="submit" id="addPost" name="submit" class="btn btn-primary">Add Post</button>
                 </div>
                 
                 <div class="clearfix"></div>
             </form>
             <%- include('../partials/footer') %>
-        </div>
+        
           <!-- /.container -->
         </div>
     
@@ -82,5 +62,36 @@
     
     <script src="/javascripts/bootstrap.js"></script>
     <script src="/javascripts/jquery-3.2.1.js"></script>
+        <script>
+            $('#addPostForm').submit((e)=>{
+              e.preventDefault();
+            //   var file = $("#photo")[0].files[0];
+              var data = {
+                "title": $('#title').val(),
+                "details": $('#body').val()
+              };
+              $('#addPost').text('Please wait...').attr('disabled',true);
+              $.ajax({
+                type:'POST',
+                url: '/users/add_post',
+                data: data,
+                success:function(data){
+                    console.log(data);
+                  if(data['status'] == 0){
+                    $('.alert').text(data['message']).removeClass('alert-success').addClass('alert-danger').css('display','inline');
+                    $('#addPost').text('Add Post').attr('disabled',false);
+                  }else{
+                   $('.alert').text(data['message']).removeClass('alert-danger').addClass('alert-success').css('display','inline');
+                   setTimeout(()=>{
+                     window.location ='/users/posts';
+                   },3000)
+                  }
+                },
+                error: function(xhr){
+                  console.log(xhr);
+                }
+              })
+            })
+        </script>
   </body>
 </html>

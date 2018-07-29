@@ -32,67 +32,37 @@
             </a>
         </li>
         <li
-        <% if(name === 'myPosts'){ %>
+        <% if(name === 'Posts'){ %>
             class="active"
         <% }else{ %>
             class=""
         <% }%>
         >
-            <a href="/posts/my_posts">
+            <a href="/users/posts">
                 <i class="pe-7s-note2"></i>
                 <p>View My Posts</p>
             </a>
         </li>
 
         <li
-        <% if(name === 'addPost'){ %>
+        <% if(name === 'Add Post'){ %>
             class="active"
         <% }else{ %>
             class=""
         <% }%>
         >
-            <a href="/posts/add_post">
+            <a href="/users/add_post">
                 <i class="pe-7s-note2"></i>
                 <p>Add Post</p>
             </a>
         </li>
-        <li
-        <% if(name === 'viewCat'){ %>
-            class="active"
-        <% }else{ %>
-            class=""
-        <% }%>
-        >
-            <a href="/categories/view_my_cat">
-                <i class="pe-7s-news-paper"></i>
-                <p>View Category</p>
-            </a>
-        </li>
-        <li
-        <% if(name === 'addCat'){ %>
-            class="active"
-        <% }else{ %>
-            class=""
-        <% }%>
-        >
-            <a href="/categories/add_cat">
-                <i class="pe-7s-science"></i>
-                <p>Add Category</p>
-            </a>
-        </li>
         <li>
-            <a href="maps.html">
-                <i class="pe-7s-map-marker"></i>
-                <p>Maps</p>
-            </a>
+                <a href="/users/logout">
+                    <i class="pe-7s-note2"></i>
+                    <p>logout</p>
+                </a>
         </li>
-        <li>
-            <a href="notifications.html">
-                <i class="pe-7s-bell"></i>
-                <p>Notifications</p>
-            </a>
-        </li>
-       
+        
     </ul>
 </div>
 </div>

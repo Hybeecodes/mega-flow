@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
-const UserInfo = require('../models/UserInfo');
+const Post = require('../models/Post');
 const UserHandler = require('../handlers/UserHandler');
 const EnsureLoggedIn = require('../middleware/ensureLoggedIn');
 const passport = require('../config/passport');
@@ -83,5 +83,53 @@ module.exports.logout = (req,res)=>{
   res.redirect('/login');
 }
 
+////////////////////User Posts ////////////////////////////////
+module.exports.getUsersPosts = (req,res)=>{
+    var user = req.session.user;
+    UserHandler.getUserPosts(user._id).then((posts)=>{
+        res.render('users/my_posts',{title:'My Posts',name:'Posts',posts:posts,user:user});
+    }).catch((err)=>{
+        console.log(err);
+    })
+}
 
+module.exports.getAddPost = (req,res)=>{
+    var user = req.session.user;
+    res.render('users/add_post',{title:'Add New Post',name:'Add Post',user:user});
+}
+
+module.exports.postAddPost = (req,res)=>{
+    const title = req.body.title;
+    const detail = req.body.details;
+    // console.log(req.body);
+    // validate
+    if(!UserHandler.validateData(title,detail)){
+        res.json({status:0,message:"Please Fill all Fields"});
+        return;
+    }
+    const postData = {
+        title: title,
+        detail: detail,
+        author: req.session.user._id
+    };
+    UserHandler.addNewPost(postData).then((post)=>{
+        res.json({status:1,message:"Post Created Successfully!"});
+    }).catch((err)=>{
+        res.json({status:0,message:"Sorry, Unable to Create Post!"+err});
+    });
+
+}
+
+module.exports.getUserPost = (req,res)=>{
+    if(req.params.postId){   
+    const postId = req.params.postId;
+    UserHandler.getPostById(postId).then((post)=>{
+        res.render('users/post',{title:`View Post - ${post.title} `,post:post,user:req.session.user,name:'Post'});
+    }).catch((err)=>{
+        res.redirect('/users/posts');
+    })
+    }else{
+        res.redirect('/users/posts');
+    }
+}
 

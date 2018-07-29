@@ -7,9 +7,7 @@ const passport = require('../config/passport');
 const uploadFile = require('../middleware/multer');
 
 /* GET home page. */
-router.get('/', (req,res)=>{
-    res.render('index',{title:'Mega-Flow'});
-});
+router.get('/',GuestController.getIndex);
 
 router.post('/login',GuestController.authenticateUser);
 
@@ -23,5 +21,9 @@ router.post('/register',GuestController.register);
 router.get('/reset_password',GuestController.getResetPass)
 
 router.post('/reset_password',GuestController.resetUserPass);
+
+router.get('/post/:postId',GuestController.getUserPost);
+
+router.post('/post_comment',GuestController.postComment);
 
 module.exports = router;

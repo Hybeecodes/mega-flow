@@ -7,9 +7,6 @@
   </head>
   <body>    
       <%- include('../partials/header') %>
-      
-   
-
     <!-- Page Content -->
     <div class="container">
         <%- include('../partials/user-side-nav') %>
@@ -26,17 +23,17 @@
                         
                           <div class="card-body">
                               <h2  class="card-title"><b> <%= post.title %> </b></h2>
-                              <% if(post.post_img != ''){ %>
+                              <% if(post.post_img){ %>
                                 <% var img = post.post_img.path.substring(6); %>
                                 <img class="card-img-top img-responsive" src="<%= img %>" alt="Card image cap">
                               <% } %>
-                              <% var body = post.body.substring(0,230); %>
+                              <% var body = post.detail.substring(0,230); %>
                               <p class="card-text"><%= body %>...</p>
                               
-                              <a href="/posts/get_post/<%= post._id%>" class="btn btn-primary">Read More &rarr;</a>
+                              <a href="/users/post/<%= post._id%>" class="btn btn-primary">Read More &rarr;</a>
                           </div>
                           <div class="card-footer text-muted">                              
-                             <p> Posted by <a href="#"> <%= post.author %> </a> on  <%= moment(post.date).format("MM-DD-YYYY") %>  </p>
+                             <p> Posted by <a href="#"> <%= post.author.username %> </a> on  <%= moment(post.created_at).format("MM-DD-YYYY") %>  </p>
                           </div>
                       </div>
                       <% }); %>
@@ -50,7 +47,7 @@
                   </div>
                 </div>
                    <%}else{%>
-                        <h5>You currently have  have no post. <a href="/posts/add_post">click here to create a post</a> </h5>
+                        <h5>You currently have  have no post. <a href="/users/add_post">click here to create a post</a> </h5>
                    <%}%>
                     
                      

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/bootstrap.css">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>    
+      
+    <%- include('../partials/not_user_header') %>
+
+    <!-- Page Content -->
+    <div class="container">
+                    <div class="row">
+            
+                        <!-- Post Content Column -->
+                        <div class="col-lg-10">
+            
+                            <!-- Title -->
+                            <h1 class="mt-4"><b> <%= post.title %> </b></h1>
+            
+                            <!-- Author -->
+                            <p class="lead">
+                                by <a href="#"> <%= post.author.username %> </a>
+                            </p>
+                            <hr>
+            
+                            <!-- Date/Time -->
+                            <p>Posted on <%= moment(post.date).format("LL") %> </p>
+            
+                            <hr>
+            
+                            <% if(post.post_img){ %>
+                                <% var img = post.post_img.path.substring(6); %>
+                                <img class="card-img-top img-responsive" src="<%= img %>" alt="Card image cap">
+                              <% } %>
+                            <hr>
+            
+                            <!-- Post Content -->
+                            <p class="lead"> 
+                                <%= post.detail %>
+                            </p>
+            
+                            <hr>
+                            <div>
+                                <h4>Please Comment:</h4>
+                                <form id="commentForm" >
+                                    <div class="form-group">
+                                        <input type="text" name="name" id="commenter_name" placeholder="John Doe" class="form-control">
+                                    </div>
+                                    <input type="hidden" name="" id="postId" value="<%= post._id %>">
+                                    <div class="form-group">
+                                        <textarea name="comment" id="comment" cols="30" rows="10" class="form-control"></textarea>
+                                    </div>
+                                    <div>
+                                        <button type="submit" class="btn btn-primary" id="submit">Comment</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <h3>Comments</h3>
+                            <!-- Single Comment -->
+                            <% if(post.comments.length >0){
+                                post.comments.forEach((comment)=>{ %>
+                                    <div class="media mb-4">
+                                            <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+                                            <div class="media-body">
+                                                <h5 class="mt-0"><%= comment.commenter_name %></h5>
+                                                <p><%= comment.comment %></p>
+                                            </div>
+                                        </div>
+                            <%    })
+                            } %>
+                           
+            
+                        </div>
+
+                         <!-- Sidebar Widgets Column -->
+                        
+                                </div>
+                                <!-- /.row -->
+    <script src="/javascripts/bootstrap.js"></script>
+    <script src="/javascripts/jquery-3.2.1.js"></script>
+        <script>
+            $('#commentForm').submit((e)=>{
+              e.preventDefault();
+              var data = {
+                "commenter_name": $('#commenter_name').val(),
+                "comment": $('#comment').val(),
+                "post": $('#postId').val()
+              };
+             var fd = new FormData(this);
+              $('#submit').text('Please wait...').attr('disabled',true);
+              $.ajax({
+                type:'POST',
+                url: '/post_comment',
+                data: data,
+                success:function(data){
+                    console.log(data);
+                  if(data['status'] == 0){
+                    $('.alert').text(data['message']).removeClass('alert-success').addClass('alert-danger').css('display','inline');
+                    $('#submit').text('Comment').attr('disabled',false);
+                  }else{
+                   $('.alert').text(data['message']).removeClass('alert-danger').addClass('alert-success').css('display','inline');
+                   setTimeout(()=>{
+                     location.reload(true);
+                   },3000)
+                  }
+                },
+                error: function(xhr){
+                  console.log(xhr);
+                }
+              })
+            })
+          </script>
+  </body>
+</html>

@@ -1,15 +1,30 @@
 const User = require('../models/User');
-const UserInfo = require('../models/UserInfo');
-const bcrypt = require('bcrypt-nodejs')
+const Post = require('../models/Post');
+const bcrypt = require('bcrypt-nodejs');
+const Comment = require('../models/Comment');
+
+module.exports.getAllPosts = ()=>{
+    return new Promise((resolve,reject)=>{
+        Post.find({},{}).populate('author','username').exec((err,posts)=>{
+            if(err)
+                reject(err);
+            else
+                resolve(posts);
+        })
+    })
+}
 
 module.exports.getAllUsers = ()=>{
-    User.find({},{},(err,users)=>{
-        if(err){
-            return Promise.reject(err);
-        }else{
-            return Promise.resolve(users);
-        }
+    return new Promise((resolve,reject)=>{
+        User.find({},{},(err,users)=>{
+            if(err){
+                reject(err);
+            }else{
+                resolve(users);
+            }
+        })
     })
+    
 }
 
 module.exports.getUserById = (userId)=>{
@@ -199,3 +214,58 @@ module.exports.getUserInfoByInfo = (userId)=>{
    
 }
 
+module.exports.getUserPosts = (author)=>{
+    return new Promise((resolve,reject)=>{
+        Post.find({author:author}).populate('author','username').exec((err,posts)=>{
+            if(err)
+                reject(err);
+            else
+                resolve(posts);
+        })
+    });
+}
+
+module.exports.addNewPost = (postData)=>{
+    return new Promise((resolve,reject)=>{
+        Post.create(postData,(err,post)=>{
+            if(err)
+                reject(err);
+            else
+                resolve(post);
+        });
+    });
+}
+
+module.exports.getPostById = (postId)=>{
+    return new Promise((resolve,reject)=>{
+        Post.findById(postId).populate('comments').populate('author','username').exec((err,post)=>{
+            console.log(post);
+            if(err)
+                reject(err);
+            else
+                resolve(post);
+        })
+    });
+}
+
+module.exports.addComment = (commentData)=>{
+    return new Promise((resolve,reject)=>{
+        Comment.create(commentData,(err,comment)=>{
+            if(err)
+                reject(err);
+            else
+                resolve(comment);
+        });
+    })
+}
+
+module.exports.getPostComment = (postId)=>{
+    return new Promise((resolve,reject)=>{
+        Comment.find({post:postId}).exec((err,comments)=>{
+            if(err)
+                reject(err);
+            else
+                resolve(comments);
+        });
+    });
+}

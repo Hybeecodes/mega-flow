@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const Post = require('./Post');
 
 const UserSchema = new Schema({
     firstname: {
@@ -58,6 +59,10 @@ const UserSchema = new Schema({
         type: String,
         required:false
     },
+    posts:[{
+        type: Schema.Types.ObjectId,
+        ref: 'Post'
+    }],
     photo: {
         type: Object
     }
