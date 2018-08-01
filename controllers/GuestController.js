@@ -10,8 +10,13 @@ const bcrypt = require('bcrypt-nodejs');
 
 
 module.exports.getIndex = (req,res)=>{
-    UserHandler.getAllPosts().then((posts)=>{
-        res.render('index',{title:'Mega-Flow',posts:posts});
+    UserHandler.getPopularPosts().then((popularPosts)=>{
+        UserHandler.getRecentPosts().then((recentPosts)=>{
+            res.render('index',{title:'Mega-Flow',popularPosts:popularPosts,recentPosts:recentPosts});
+        }).catch((err)=>{
+            res.send('Sorry, An Error Occured');
+        })
+        
     }).catch((err)=>{
         res.send('Sorry, An Error Occured');
     })
@@ -21,6 +26,7 @@ module.exports.getUserPost = (req,res)=>{
     if(req.params.postId){   
     const postId = req.params.postId;
     UserHandler.getPostById(postId).then((post)=>{
+        UserHandler.updatePostViews(post._id);
         res.render('users/post',{title:`View Post - ${post.title} `,post:post,user:req.session.user,name:'Post'});
     }).catch((err)=>{
         res.redirect('/');
@@ -69,9 +75,11 @@ module.exports.register = (req,res)=>{
     const username = req.body.username;
     if(!UserHandler.validateData(firstname,lastname,password,password2,email,username)){
         res.json({status:0,message:"Please fill all fields!"});
-        return;
     }
-
+    if(!req.file){
+        res.json({status:0,message:"Please Select a File for upload"});
+    }
+    const user_photo = req.file.path.substring(6);
     if(UserHandler.checkUserByEmail(email)){
         res.json({status:0,message:"Email exists Already"});
         return;
@@ -81,9 +89,14 @@ module.exports.register = (req,res)=>{
         return;
     }else{
         const newUser = {
-
+            firstname: firstname,
+            lastname: lastname,
+            password: password,
+            email: email,
+            username: username,
+            photo: user_photo
         };
-        UserHandler.addNewUser(req.body).then((user)=>{
+        UserHandler.addNewUser(newUser).then((user)=>{
             res.json({status:1,message:"Registration Successful"});
         }).catch((err)=>{
             res.json({status:0,message:"Sorry,An erorr occured"});
@@ -214,4 +227,12 @@ module.exports.postComment = (req,res)=>{
             res.json({status:0,message:"Sorry, Unable to add comment!"+err});
         })
     }
+}
+
+module.exports.paginatePost = (req,res)=>{
+    UserHandler.paginatePost().then((post)=>{
+
+    }).catch((err)=>{
+        
+    })
 }

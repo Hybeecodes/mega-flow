@@ -23,8 +23,8 @@
                         
                           <div class="card-body">
                               <h2  class="card-title"><b> <%= post.title %> </b></h2>
-                              <% if(post.post_img){ %>
-                                <% var img = post.post_img.path.substring(6); %>
+                              <% if(post.image){ %>
+                                <% var img = post.image; %>
                                 <img class="card-img-top img-responsive" src="<%= img %>" alt="Card image cap">
                               <% } %>
                               <% var body = post.detail.substring(0,230); %>

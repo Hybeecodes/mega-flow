@@ -73,12 +73,12 @@ module.exports.updateUserProfile = (req,res)=>{
         var twitter = req.body.twitter;
         var instagram = req.body.instagram;
         var about = req.body.about;
-        // if(req.file){
-        //   var photo = req.file;
+        if(req.file){
+          var photo = req.file.path.substring(6);
           
-        // }else{
-        //   var photo = req.user.photo;
-        // }
+        }else{
+          var photo = req.user.photo;
+        }
     
         //check if user info exist
             User.findOneAndUpdate({_id: req.session.user._id},
@@ -95,7 +95,8 @@ module.exports.updateUserProfile = (req,res)=>{
                  facebook:facebook,
                  twitter:twitter,
                  instagram:instagram,
-                 about:about
+                 about:about,
+                 photo:photo
                 }},(err,result)=>{
                   if(err){
                     reject(err);
@@ -129,12 +130,14 @@ module.exports.addNewUser = (userData)=>{
         var password = bcrypt.hashSync(userData.password);
         var email = userData.email;
         var username = userData.username;
+        var photo = userData.photo;
         newUser = {
             firstname: firstname,
             lastname: lastname,
             password: password,
             email: email,
-            username: username
+            username: username,
+            photo: photo
         };
 
         User.create(newUser,(err,user)=>{
@@ -267,5 +270,50 @@ module.exports.getPostComment = (postId)=>{
             else
                 resolve(comments);
         });
+    });
+}
+
+module.exports.updatePostViews = (postId)=>{
+        Post.findById(postId,(err,post)=>{
+            if(err)
+                reject(err);
+            else{
+                Post.updateOne({_id:post._id},{$set:{views:post.views+1}},(err,post)=>{
+                    if(err)
+                        return false;
+                    else
+                        return true;
+                });
+            }
+        });
+}
+
+module.exports.getPopularPosts = ()=>{
+    return new Promise((resolve,reject)=>{
+        Post.find({},{}).sort({'views':'desc'}).limit(5).exec((err,posts)=>{
+            if(err)
+                reject(err);
+            else
+                resolve(posts);
+        })
+    })
+}
+
+module.exports.getRecentPosts = ()=>{
+    return new Promise((resolve,reject)=>{
+        Post.find({},{}).sort({'created_at':'asc'}).limit(5).exec((err,posts)=>{
+            if(err)
+                reject(err);
+            else
+                resolve(posts);
+        })
+    })
+}
+
+module.exports.paginatePost = ()=>{
+    return new Promise((resolve,reject)=>{
+        Post.paginate({},{offset:2,page:1,limit:5},(err,posts)=>{
+            console.log(posts);
+        })
     });
 }

@@ -47,17 +47,18 @@
     <!-- Main Content -->
     <div class="container">
       <div class="row">
-        <div class="col-lg-10 col-md-10 mx-auto">
-          <% if(posts.length >0){ 
-          posts.forEach((post)=>{ %>
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <% if(popularPosts.length >0){ %>
+            <h1 style="font-weight:bold;">Popular Posts</h1>
+          <% popularPosts.forEach((post)=>{ %>
             <div class="post-preview">
                 <a href="/post/<%= post._id%>">
-                  <h2 class="post-title">
+                  <h2 class="post-title" style="font-weight:bold">
                       <%= post.title %>
                   </h2>
                   <h3 class="post-subtitle">
                       <% var body = post.detail.substring(0,230); %>
-                      <%= body %>
+                      <%= body %>...
                   </h3>
                 </a>
                 <p class="post-meta">Posted by
@@ -73,8 +74,29 @@
             <a class="btn btn-secondary float-right" href="#">Older Posts &rarr;</a>
           </div>
         </div>
-        <div class="col-lg-2">
-          Sidebar
+        <div class="col-lg-4">
+          
+          <% if(recentPosts.length >0){ %>
+            <h3 style="font-weight: bold;">Recent Posts</h3>
+          <% recentPosts.forEach((r_post)=>{ %>
+            <div class="post-preview">
+                <a href="/post/<%= r_post._id%>">
+                  <h4 class="" style="font-weight:bold">
+                      <%= r_post.title %>
+                  </h4>
+                  <h5 class="post-subtitle">
+                      <% var body = r_post.detail.substring(0,230); %>
+                      <%= body %>...
+                  </h5>
+                </a>
+                <p class="">Posted by
+                  <a href="#"><%= r_post.author.username %></a>
+                  on <%= moment(r_post.created_at).format("LL") %></p>
+              </div>
+              <hr>
+          <% }) }else{ %>
+            <h2>No Post Yet</h2>
+            <% } %>
         </div>
       </div>
     </div>

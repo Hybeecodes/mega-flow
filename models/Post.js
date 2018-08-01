@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const User = require('./User');
 const Comment = require('./Comment');
+const mongoosePaginate = require('mongoose-paginate');
+
 
 PostSchema = new Schema({
     title:{
@@ -18,10 +20,19 @@ PostSchema = new Schema({
         ref:'User',
         required:true,
     },
+    image:{
+        type:String,
+        required:false
+    },
     comments:[{
         type: Schema.Types.ObjectId,
         ref: 'Comment'
     }],
+    views:{
+        type:Number,
+        required:true,
+        default:0
+    },
     created_at:{
         type:Date,
         required:true,
@@ -33,6 +44,7 @@ PostSchema = new Schema({
         default:Date.now()
     }
 });
+PostSchema.plugin(mongoosePaginate);
 
 const Post = mongoose.model('Post',PostSchema);
 

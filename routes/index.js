@@ -15,15 +15,17 @@ router.get('/login',GuestController.getLogin);
 
 router.get('/register',GuestController.getRegister);
 
-router.post('/register',GuestController.register);
+router.post('/register',uploadFile.single('photo'),GuestController.register);
 
 //forgot password
-router.get('/reset_password',GuestController.getResetPass)
+router.get('/reset_password',GuestController.getResetPass);
 
 router.post('/reset_password',GuestController.resetUserPass);
 
 router.get('/post/:postId',GuestController.getUserPost);
 
 router.post('/post_comment',GuestController.postComment);
+
+router.get('/paginate',GuestController.paginatePost);
 
 module.exports = router;

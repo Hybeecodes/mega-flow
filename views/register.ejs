@@ -63,20 +63,18 @@
      <script>
        $('#registerForm').submit((e)=>{
          e.preventDefault();
-         var data = {
-           "firstname": $('#firstname').val(),
-           "lastname": $('#lastname').val(),
-           "username": $('#username').val(),
-           "email": $('#email').val(),
-           "password": $('#password').val(),
-           "password2": $('#password2').val()
-         };
-        var fd = new FormData(this);
+         
+         var form = $('#registerForm')[0];
+	        var data = new FormData(form);
          $('#submit').text('Please wait...').attr('disabled',true);
          $.ajax({
            type:'POST',
+           enctype:'multipart/form-data',
            url: '/register',
            data: data,
+           processData: false, //prevent jQuery from automatically transforming the data into a query string
+            contentType: false,
+            cache: false,
            success:function(data){
              if(data['status'] == 0){
                $('.alert').text(data['message']).removeClass('alert-success').addClass('alert-danger').css('display','inline');

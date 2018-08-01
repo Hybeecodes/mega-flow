@@ -64,7 +64,8 @@ const UserSchema = new Schema({
         ref: 'Post'
     }],
     photo: {
-        type: Object
+        type: String,
+        required:true
     }
 });
 const User = mongoose.model('User',UserSchema);

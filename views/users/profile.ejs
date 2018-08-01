@@ -226,7 +226,7 @@
                                 <div class="author">
                                      <a href="#">
                                          <% if(user.photo){
-                                            var img = user.photo.path.substring(6);
+                                            var img = user.photo;
                                          } %>
                                                            
                                     <img class="avatar border-gray"
@@ -297,27 +297,17 @@
 <script>
     $('#profileForm').submit((e)=>{
       e.preventDefault();
-      var data = {
-        "firstname": $('#firstname').val(),
-        "lastname": $('#lastname').val(),
-        "username": $('#username').val(),
-        "email": $('#email').val(),
-        "blogname": $('#blogname').val(),
-        "address": $('#address').val(),
-        "city": $('#city').val(),
-        "country": $('#country').val(),
-        "zipcode": $('#zip_code').val(),
-        "about": $('#about').val(),
-        "facebook": $('#facebook').val(),
-        "twitter": $('#twitter').val(),
-        "instagram": $('#instagram').val()
-      };
-     var fd = new FormData(this);
+      var form = $('#profileForm')[0];
+     var data = new FormData(form);
       $('#update').text('Please wait...').attr('disabled',true);
       $.ajax({
         type:'POST',
+        enctype:'multipart/form-data',
         url: '/users/profile',
         data: data,
+        processData: false, //prevent jQuery from automatically transforming the data into a query string
+        contentType: false,
+        cache: false,
         success:function(data){
           if(data['status'] == 0){
             $('.alert').text(data['message']).removeClass('alert-success').addClass('alert-danger').css('display','inline');

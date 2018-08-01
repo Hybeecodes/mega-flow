@@ -29,7 +29,7 @@ router.get('/posts',UserController.getUsersPosts);
 
 router.get('/add_post',UserController.getAddPost);
 
-router.post('/add_post',UserController.postAddPost);
+router.post('/add_post',uploadFile.single('post_img'),UserController.postAddPost);
 
 router.get('/post/:postId',UserController.getUserPost);
 

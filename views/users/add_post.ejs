@@ -66,15 +66,17 @@
             $('#addPostForm').submit((e)=>{
               e.preventDefault();
             //   var file = $("#photo")[0].files[0];
-              var data = {
-                "title": $('#title').val(),
-                "details": $('#body').val()
-              };
+              var form = $('#addPostForm')[0];
+              var data = new FormData(form);
               $('#addPost').text('Please wait...').attr('disabled',true);
               $.ajax({
                 type:'POST',
+                enctype:'multipart/form-data',
                 url: '/users/add_post',
                 data: data,
+                processData: false, //prevent jQuery from automatically transforming the data into a query string
+                contentType: false,
+                cache: false,
                 success:function(data){
                     console.log(data);
                   if(data['status'] == 0){

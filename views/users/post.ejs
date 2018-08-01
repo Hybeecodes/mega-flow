@@ -30,8 +30,8 @@
             
                             <hr>
             
-                            <% if(post.post_img){ %>
-                                <% var img = post.post_img.path.substring(6); %>
+                            <% if(post.image){ %>
+                                <% var img = post.image; %>
                                 <img class="card-img-top img-responsive" src="<%= img %>" alt="Card image cap">
                               <% } %>
                             <hr>
@@ -61,13 +61,16 @@
                             <!-- Single Comment -->
                             <% if(post.comments.length >0){
                                 post.comments.forEach((comment)=>{ %>
-                                    <div class="media mb-4">
+                                    <div class="comments">
+                                        <div class="media mb-4">
                                             <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
                                             <div class="media-body">
                                                 <h5 class="mt-0"><%= comment.commenter_name %></h5>
                                                 <p><%= comment.comment %></p>
                                             </div>
                                         </div>
+                                    </div>
+                                    
                             <%    })
                             } %>
                            
@@ -101,9 +104,15 @@
                     $('#submit').text('Comment').attr('disabled',false);
                   }else{
                    $('.alert').text(data['message']).removeClass('alert-danger').addClass('alert-success').css('display','inline');
-                   setTimeout(()=>{
-                     location.reload(true);
-                   },3000)
+                   var newComment = `
+                                        <div class="media mb-4">
+                                            <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+                                            <div class="media-body">
+                                                <h5 class="mt-0">${data.message.commenter_name}</h5>
+                                                <p>${data.message.comment}</p>
+                                            </div>
+                                        </div>
+                   `
                   }
                 },
                 error: function(xhr){

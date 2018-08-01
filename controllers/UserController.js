@@ -100,11 +100,11 @@ module.exports.getAddPost = (req,res)=>{
 
 module.exports.postAddPost = (req,res)=>{
     const title = req.body.title;
-    const detail = req.body.details;
+    const detail = req.body.body;
     // console.log(req.body);
     // validate
     if(!UserHandler.validateData(title,detail)){
-        res.json({status:0,message:"Please Fill all Fields"});
+        res.json({status:0,message:"Please Fill all Fieldhghgs"});
         return;
     }
     const postData = {
@@ -112,12 +112,15 @@ module.exports.postAddPost = (req,res)=>{
         detail: detail,
         author: req.session.user._id
     };
+    if(req.file){
+        postData.image = req.file.path.substring(6);
+    }
+    
     UserHandler.addNewPost(postData).then((post)=>{
         res.json({status:1,message:"Post Created Successfully!"});
     }).catch((err)=>{
         res.json({status:0,message:"Sorry, Unable to Create Post!"+err});
     });
-
 }
 
 module.exports.getUserPost = (req,res)=>{
