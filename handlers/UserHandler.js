@@ -77,7 +77,7 @@ module.exports.updateUserProfile = (req,res)=>{
           var photo = req.file.path.substring(6);
           
         }else{
-          var photo = req.user.photo;
+          var photo = req.session.user.photo;
         }
     
         //check if user info exist

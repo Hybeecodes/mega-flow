@@ -64,38 +64,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// app.use(csrf);
-// app.use(function(req, res, next){
-//   res.locals._csrfToken = req.csrfToken();
-//   next();
-//   });
-
-// app.use(function(req, res, next){
-//   // if there's a flash message, transfer
-//   // it to the context, then clear it
-//   res.locals.flash = req.session.flash;
-//   delete req.session.flash;
-//   next();
-//   });
-
 app.use(expressValidator());
-// app.use(expressValidator({
-//   errorFormatter: function(param, msg, value) {
-//       var namespace = param.split('.')
-//       , root    = namespace.shift()
-//       , formParam = root;
- 
-//     while(namespace.length) {
-//       formParam += '[' + namespace.shift() + ']';
-//     }
-//     return {
-//       param : formParam,
-//       msg   : msg,
-//       value : value
-//     };
-//   }
-// }));
-
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -105,8 +74,6 @@ app.use(function(req,res,next){
   res.locals.messages = require('express-messages')(req,res);
   next();
 });
-
-
 
 app.use('/', index);
 app.use('/users', users);

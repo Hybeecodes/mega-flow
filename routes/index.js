@@ -9,6 +9,10 @@ const uploadFile = require('../middleware/multer');
 /* GET home page. */
 router.get('/',GuestController.getIndex);
 
+// router.get('/session',(req,res)=>{
+//     res.send(req.user);
+// })
+
 router.post('/login',GuestController.authenticateUser);
 
 router.get('/login',GuestController.getLogin); 

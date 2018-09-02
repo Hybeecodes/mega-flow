@@ -22,7 +22,8 @@ module.exports.updateProfile =  (req,res,next)=>{
     UserHandler.updateUserProfile(req,res).then((result)=>{
         res.json({status:1,message:"Profile Updated Successfully!"});
     }).catch((err)=>{
-        res.json({status:0,message:"Sorry, Unable to Update Status!"+err});
+        console.error(err)
+        res.json({status:0,message:"Sorry, Unable to Update Status!"});
     });
 }
 
@@ -30,7 +31,7 @@ module.exports.getProfile = (req,res,next)=>{
     UserHandler.getUserById(req.session.user._id).then(user=>{
         res.render('users/profile',{user:user,title:'MegaFlow - profile', name:'profile'});
     }).catch(err=>{
-        res.redirect('/users/dashboard');
+        next(err);
     });
 }
 
@@ -40,7 +41,7 @@ module.exports.getChangePass = (req,res,next)=>{
     req.session.errors = null;
 }
 
-module.exports.changeUserPass = (req,res)=>{
+module.exports.changeUserPass = (req,res,next)=>{
     req.checkBody('password1','please enter your old password').notEmpty();
   req.checkBody('password2','please enter your new password').notEmpty();
   req.checkBody('password3','Please confirm your new password').equals(req.body.password2);
@@ -63,7 +64,7 @@ module.exports.changeUserPass = (req,res)=>{
             sendMail(subject,text,to).then((info)=>{
                 res.redirect('/users/login');
             }).catch((err)=>{
-                console.log(err);
+                next(err);
             });  
       }).catch((err)=>{
         var errors = [
@@ -80,16 +81,16 @@ module.exports.changeUserPass = (req,res)=>{
 
 module.exports.logout = (req,res)=>{
     req.session.user = null;
-  res.redirect('/login');
+    res.redirect('/login');
 }
 
 ////////////////////User Posts ////////////////////////////////
-module.exports.getUsersPosts = (req,res)=>{
+module.exports.getUsersPosts = (req,res,next)=>{
     var user = req.session.user;
     UserHandler.getUserPosts(user._id).then((posts)=>{
         res.render('users/my_posts',{title:'My Posts',name:'Posts',posts:posts,user:user});
     }).catch((err)=>{
-        console.log(err);
+        next(err);
     })
 }
 
@@ -104,7 +105,7 @@ module.exports.postAddPost = (req,res)=>{
     // console.log(req.body);
     // validate
     if(!UserHandler.validateData(title,detail)){
-        res.json({status:0,message:"Please Fill all Fieldhghgs"});
+        res.json({status:0,message:"Please Fill all Fields"});
         return;
     }
     const postData = {
@@ -119,17 +120,17 @@ module.exports.postAddPost = (req,res)=>{
     UserHandler.addNewPost(postData).then((post)=>{
         res.json({status:1,message:"Post Created Successfully!"});
     }).catch((err)=>{
-        res.json({status:0,message:"Sorry, Unable to Create Post!"+err});
+        res.json({status:0,message:"Sorry, Unable to Create Post!"});
     });
 }
 
-module.exports.getUserPost = (req,res)=>{
+module.exports.getUserPost = (req,res,next)=>{
     if(req.params.postId){   
     const postId = req.params.postId;
     UserHandler.getPostById(postId).then((post)=>{
         res.render('users/post',{title:`View Post - ${post.title} `,post:post,user:req.session.user,name:'Post'});
     }).catch((err)=>{
-        res.redirect('/users/posts');
+        next(err)
     })
     }else{
         res.redirect('/users/posts');

@@ -9,30 +9,30 @@ const passwoid = require('passwoid');
 const bcrypt = require('bcrypt-nodejs');
 
 
-module.exports.getIndex = (req,res)=>{
+module.exports.getIndex = (req,res,next)=>{
     UserHandler.getPopularPosts().then((popularPosts)=>{
         UserHandler.getRecentPosts().then((recentPosts)=>{
             res.render('index',{title:'Mega-Flow',popularPosts:popularPosts,recentPosts:recentPosts});
         }).catch((err)=>{
-            res.send('Sorry, An Error Occured');
+            next(err);
         })
         
     }).catch((err)=>{
-        res.send('Sorry, An Error Occured');
+        next(err);
     })
 }
 
-module.exports.getUserPost = (req,res)=>{
+module.exports.getUserPost = (req,res,next)=>{
     if(req.params.postId){   
     const postId = req.params.postId;
     UserHandler.getPostById(postId).then((post)=>{
         UserHandler.updatePostViews(post._id);
         res.render('users/post',{title:`View Post - ${post.title} `,post:post,user:req.session.user,name:'Post'});
     }).catch((err)=>{
-        res.redirect('/');
+        next(err);
     })
     }else{
-        res.redirect('/');
+        next(err);
     }
 }
 
@@ -99,13 +99,13 @@ module.exports.register = (req,res)=>{
         UserHandler.addNewUser(newUser).then((user)=>{
             res.json({status:1,message:"Registration Successful"});
         }).catch((err)=>{
+            console.error(err);
             res.json({status:0,message:"Sorry,An erorr occured"});
         })
     }
 }
 
 module.exports.registerUser = (req,res,next)=>{
-    console.log(req)
     res.send("something");
     req.checkBody('firstname','firstname is required').notEmpty();
     req.checkBody('lastname','lastname is required').notEmpty();
@@ -144,7 +144,7 @@ module.exports.registerUser = (req,res,next)=>{
                         sendMail(subject,text,to).then((info)=>{
                             res.redirect('/login');
                         }).catch((err)=>{
-                            console.log(err);
+                            next(err);
                         });
                     }).catch((err)=>{
                         var errors = [
@@ -189,7 +189,7 @@ module.exports.resetUserPass = (req,res,next)=>{
               sendMail(subject,text,to).then((info)=>{
                   res.redirect('/users/login');
               }).catch((err)=>{
-                  console.log(err);
+                  next(err);
               });  
           }).catch((err)=>{
             var errors = [
@@ -204,7 +204,7 @@ module.exports.resetUserPass = (req,res,next)=>{
   });
 }
 
-module.exports.postComment = (req,res)=>{
+module.exports.postComment = (req,res,next)=>{
     const commenter_name = req.body.commenter_name;
     const comment = req.body.comment;
     const postId = req.body.post;
@@ -215,16 +215,20 @@ module.exports.postComment = (req,res)=>{
             UserHandler.getPostById(postId).then((post)=>{
                 post.comments.push(comment._id);
                 post.save((err,post)=>{
-                    if(err)
-                        res.json({status:0,message:"Sorry, Unable to add comment!"+err});
+                    if(err){
+                        console.error(err);
+                        res.json({status:0,message:"Sorry, Unable to add comment!"});
+                    }
                     else
                     res.json({status:1,message:comment});
                 })
             }).catch((err)=>{
-                res.json({status:0,message:"Sorry, Unable to add comment!"+err});
+                console.error(err)
+                res.json({status:0,message:"Sorry, Unable to add comment!"});
             })
         }).catch((err)=>{
-            res.json({status:0,message:"Sorry, Unable to add comment!"+err});
+            console.error(err)
+            res.json({status:0,message:"Sorry, Unable to add comment!"});
         })
     }
 }
