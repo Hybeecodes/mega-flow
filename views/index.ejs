@@ -43,7 +43,6 @@
         </div>
       </div>
     </header>
-
     <!-- Main Content -->
     <div class="container">
       <div class="row">
@@ -145,10 +144,18 @@
     
     <script src="/popper/popper.min.js"></script>
     
-
     <!-- Custom scripts for this template -->
     <script src="/javascripts/clean-blog.min.js"></script>
-
+    <script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io();
+  var mes = 'something';
+  socket.emit('message',mes);
+  
+  socket.on('message',function(mes){
+    $('#msg').text(mes);
+  })
+</script>
   </body>
 
 </html>

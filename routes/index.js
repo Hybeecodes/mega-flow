@@ -5,6 +5,9 @@ var formidable = require('formidable');
 const GuestController = require('../controllers/GuestController');
 const passport = require('../config/passport');
 const uploadFile = require('../middleware/multer');
+// const io = require('socket.io');
+
+// var socket = io();
 
 /* GET home page. */
 router.get('/',GuestController.getIndex);
@@ -20,7 +23,6 @@ router.get('/login',GuestController.getLogin);
 router.get('/register',GuestController.getRegister);
 
 router.post('/register',uploadFile.single('photo'),GuestController.register);
-
 //forgot password
 router.get('/reset_password',GuestController.getResetPass);
 

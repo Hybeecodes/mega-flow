@@ -5,21 +5,15 @@ var logger = require('morgan');
 var expressValidator = require('express-validator');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var session = require('express-session');
+const session = require('express-session');
+const addRequestId = require('express-request-id')();
 // var flash = require('connect-flash');
 var passport = require('passport');
+const subdomain = require('express-subdomain');
 var LocalStrategy = require('passport-local').Strategy;
-var csrf = require('csurf');
-require('./config/db_config');
 const flash = require('express-flash-messages');
-// var MongoDBStore = require('connect-mongodb-session')(session);
-
-// require('events').EventEmitter.prototype._maxListeners = 100;
-// var store = new MongoDBStore(
-//   {
-//     uri: 'mongodb://localhost:27017/nodeblog',
-//     collection: 'mySessions'
-//   });
+const csrf = require('csurf');
+require('./config/db_config');
 
 
 var index = require('./routes/index');
@@ -31,17 +25,13 @@ var pages = require('./routes/pages');
 // var csrfProtection = csrf({ cookie: true })
 
 var app = express();
+app.use(subdomain('posts', posts));
+// app.use(addRequestId);
 app.locals.moment = require('moment');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-
-
-// store.on('error', function(error) {
-//   assert.ifError(error);
-//   assert.ok(false);
-// });
 
 
 // uncomment after placing your favicon in /public
@@ -59,8 +49,25 @@ app.use(session({
   resave: true,
   saveUninitialized: true,
   // 
-}))
+}));
+// logger.token('id',function getId(req){
+//   return req.id;
+// });
 
+// var loggerFormat = ':id [":date[web]]" :method :url" :status :responsetime ';
+
+// app.use(logger(loggerFormat,{
+//   skip: function(req,res){
+//     return res.statusCode < 400
+//   },
+//   stream: process.stderr
+// }));
+// app.use(logger(loggerFormat,{
+//   skip: function(req,res){
+//     return res.statusCode >= 400
+//   },
+//   stream: process.stdout
+// }));
 app.use(passport.initialize());
 app.use(passport.session());
 

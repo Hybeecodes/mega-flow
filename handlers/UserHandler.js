@@ -111,7 +111,7 @@ module.exports.updateUserProfile = (req,res)=>{
 
 module.exports.checkUserInfoByEmail = (email)=>{
     UserInfo.findOne({email:email},(err,userInfo)=>{
-        if(err){
+        if(err){res.status(500).json({status:0,message:err})
             return false;
         }else{
             if(userInfo){
@@ -191,7 +191,7 @@ module.exports.checkUserByEmail= (email)=>{
     })
 }
 
-module.exports.changeUserPass = (userId,email,password)=>{
+module.exports.changeUserPass = async (userId,email,password)=>{
     return new Promise((resolve,reject)=>{
         User.findOneAndUpdate({_id:userId,email:email},{$set:{password:password}},(err,result)=>{
             if(err){

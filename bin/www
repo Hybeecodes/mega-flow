@@ -8,6 +8,7 @@ var app = require('../app');
 var debug = require('debug')('nodeblog:server');
 var http = require('http');
 
+
 /**
  * Get port from environment and store in Express.
  */
@@ -21,10 +22,13 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
-
+var io = require('socket.io')(server);
 /**
  * Listen on provided port, on all network interfaces.
  */
+io.on('connection', function(socket){
+  console.log('a user connected');
+});
 
 server.listen(port);
 server.on('error', onError);
